@@ -1,0 +1,27 @@
+Package: biology
+Title: Aids Fitting curves to growth and maturity Data
+Version: 0.0.0.1000
+Date: 2020-06-28
+Authors@R: person("Malcolm", "Haddon", role = c("aut", "cre"), 
+                  email = "malcolm.haddon@gmail.com")
+Maintainer: Malcolm Haddon <malcolm.haddon@gmail.com>
+Description: Aids in fitting growth curves to invertebrate tagging data, 
+    particularly the Inverse Logistic, but also the dose-response curve and the
+    Michaelis-Menton curve. In addition, it faciliatates fitting maturity-at- 
+    size/age curves using Binomial residual errors to invertebrate maturity data.
+URL: https://www.github.com/haddonm/biology
+Depends: R (>= 3.5.0)
+License: MIT + file LICENSE 
+Encoding: UTF-8
+LazyData: true
+Imports: rutilsMH,
+    MASS,
+    mvtnorm
+Suggests: 
+    knitr,
+    rmarkdown
+RoxygenNote: 7.1.0
+NeedsCompilation: no
+Reference: Haddon, M., Mundy, C., and D. Tarbath (2008) Using an inverse-logistic 
+    model to describe growth increments of blacklip abalone (Haliotis rubra) 
+    in Tasmania. Fishery Bulletin 106:58-71
