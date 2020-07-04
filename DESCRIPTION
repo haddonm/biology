@@ -1,7 +1,7 @@
 Package: biology
 Title: Aids Fitting curves to growth and maturity Data
-Version: 0.0.0.1000
-Date: 2020-06-28
+Version: 0.0.0.950
+Date: 2020-07-04
 Authors@R: person("Malcolm", "Haddon", role = c("aut", "cre"), 
                   email = "malcolm.haddon@gmail.com")
 Maintainer: Malcolm Haddon <malcolm.haddon@gmail.com>
@@ -25,3 +25,4 @@ NeedsCompilation: no
 Reference: Haddon, M., Mundy, C., and D. Tarbath (2008) Using an inverse-logistic 
     model to describe growth increments of blacklip abalone (Haliotis rubra) 
     in Tasmania. Fishery Bulletin 106:58-71
+VignetteBuilder: knitr

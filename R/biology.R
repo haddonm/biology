@@ -3,7 +3,7 @@
 #' @importFrom grDevices palette rgb
 #' @importFrom graphics abline grid hist lines mtext par plot points
 #' @importFrom graphics text title legend polygon
-#' @importFrom stats dnorm nlm optim quantile sd
+#' @importFrom stats dnorm nlm optim quantile sd coef
 #' @importFrom rutilsMH getmax getmin setpalette
 NULL
 

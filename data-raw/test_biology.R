@@ -17,7 +17,12 @@ print(ans)
 plotprep(width=7,height=6,newdev=FALSE)
 plot(ans)
 
+plotprep(width=7,height=5,newdev=FALSE)
+plotmodelIL(ans,outliers=TRUE)
+projtozero(ans)
+
 dyn <- getdyn(ans,maxage=30)
+dyn
 
 summary(ans)
 
@@ -25,7 +30,7 @@ summary(ans)
 boot <- dobootIL(ans,reps=100)
 
 plotprep(width=7,height=6,newdev=FALSE)
-plot(boot)
+plot(boot,col=4)
 
 
 

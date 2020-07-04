@@ -33,6 +33,8 @@ Some details of the package can be found using _packageDescription("biology")_.
 
 * 28/06/2020 Initial combination of the older packages invLogistic and maturity.
 
+* 04/07/2020 added extra functionality for plots and analyses. 
+
 
 Malcolm Haddon
 

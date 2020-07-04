@@ -32,6 +32,8 @@ Some details of the package can be found using
   - 28/06/2020 Initial combination of the older packages invLogistic and
     maturity.
 
+  - 04/07/2020 added extra functionality for plots and analyses.
+
 Malcolm Haddon
 
 Hobart, June 28, 2020

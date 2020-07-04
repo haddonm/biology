@@ -4,12 +4,14 @@
 \alias{binglm}
 \title{binglm is a cleaner output from the summary of a binomial GLM}
 \usage{
-binglm(x, digits = 6)
+binglm(x, digits = 6, console = TRUE)
 }
 \arguments{
 \item{x}{the binomial glm model}
 
 \item{digits}{the number of digits printed for the coefficients}
+
+\item{console}{should the result be printed to the console, default=TRUE}
 }
 \value{
 the summary of the model (invisibly)

@@ -387,6 +387,21 @@ invlog <- function(p,Lt) {
   return(ans)
 }
 
+#' @title projtozero extends the predicted inverse logistic to zero
+#'
+#' @description projtozero extends the predicted inverse logistic derived from
+#'     fitIL to zero.
+#'
+#' @param ans the output from fitIL
+#'
+#' @return nothing but does add a line to a plot from plotmodelIL
+#' @export
+projtozero <- function(ans) {
+  x <- seq(0.1,ans$PredLt[1],0.1)
+  y <- invlog(ans$model$estimate,x)
+  lines(x,y,lwd=2,col=3)
+} #end of projtozero
+
 #invlog.vector <- function(x, ...) invlog(x[1],x[2],x[3],...)
 
 #' @title plot.bootIL an S3 method to plot the bootstrap results

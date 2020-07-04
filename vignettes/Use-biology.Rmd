@@ -1,0 +1,91 @@
+---
+title: "Use-biology"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Use-biology}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+options("show.signif.stars"=FALSE,
+        "stringsAsFactors"=FALSE,
+        "max.print"=50000,
+        "width"=240)
+
+
+```
+
+```{r setup}
+library(rutilsMH)
+library(biology)
+```
+
+
+# Introduction
+
+The package __biology__ is designed, currently, to facilitate the fitting of growth models to tagging data and maturity curves to observations on maturity vs length. This is aimed primarily at hard to age invertebrates such as abalone.
+
+An alternative view of this work is an exposition on the use of logistic functions. For the analysis of growth increments (as derived from tagging data) we would need to use inverted versions of any logistic curve, while for the description of maturation (or emergence) one would use the classical logistic 'S' shaped curve. Even though we would be using effectively identical equations, a major difference between applying these models to growth and maturity is that with growth we might be using Normal random errors, while when describing maturity with size we would be using binomial errors (mature or immature).
+
+We will consider three alternatives for both growth and maturity:
+
+1. The inverse logistic  (Haddon _et al_., 2008)
+
+2. The dose-response curve (Rogers_Bennett _et al_., 2003)
+
+3. The classical logistic curve (Quinn and Deriso, 1999)
+
+## Growth
+
+Perhaps the most common equation used to describe growth in fisheries is the von Bertalnaffy growth curve. However, as a description of the growth of invertebrates the von Bertalannfy curve fails in numerous ways. Its structure implies that as the size of an animal increases its growth rate declines linearly. This does not appear to be the case with invertebrates (especially arthropods where they have intermoult periods and moult increments to deal with). Alternative growth models have been proposed but here we will concentrate only only two. 
+
+The first is the inverse logistic curve (Haddon _et. al._, 2008), which was developed after searching for an adequate description of abalone growth, which appeared to have effectively constnat growth increments in the juveniles stages and an inverse logistic curve provided a convenient description. However, a number of equations provide a similar shaped curve and here we will also consider the inverse dose-response curve
+
+The dose-response curve is traditionally described using the standard equation:
+
+$$E=\frac{E_{max}}{1+\left(\frac{EC_{50}}{A} \right)^n}$$
+where, in terms of drug trials $E$ is the response to the drug concentration $A$, $EC_{50}$ is the concentration that produces 50% of the maximal response $E_{max}$. Finally, $n$ is known as the Hill coefficient. For our purposes we are interested in the predicted growth increment from a given initial length. This would be an inverse logistic, which we obtain by inverting the $EC_{50}/A$:
+
+$$\Delta{L}=\frac{\Delta{L_{max}}}{1+\left(\frac{L}{L_{50}} \right)^c}$$
+where $\Delta{L}$ is the growth increment, which is always less than or equal to the estimated maximum growth increment $\Delta{L_{max}}$, $L$ is the initial length of the growing animal, $L_{50}$ is the estimated length which leads to a growth increment of 50% the maximum, and $c$ is the exponent that determines the steepness of the inverse logistic. Note that the $L/L_{50}$ is the inverse of the arrangement of parameter and input data as used in the classical dose-response curve. 
+
+The classical logistic curve comes in two alternative forms:
+
+$$\Delta{L}=\frac{\Delta{L_{max}}}{1+exp{\left(a+bL \right)}^{-1}}=\frac{\Delta{L_{max}}exp{\left(a+bL \right)}}{1+exp{\left(a+bL \right)}}$$
+
+where $a$ and $b$ are the two extra parameters, the $L_{50}$ can be estimated using $-a/b$. In this case, we obtain an inverse logistic through ensuring that the $b$ parameter is negative and the $a$ parameter is positive. For a positive logistic curve, usually, the $a$ is negative and $b$ positive.
+
+
+
+## Maturity
+
+Maturation is a process where one expects to see a gradual increase in the proportion of individuals that are mature as they grwoth and age.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
