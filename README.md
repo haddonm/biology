@@ -34,6 +34,10 @@ Some details of the package can be found using
 
   - 04/07/2020 added extra functionality for plots and analyses.
 
+  - 12/07/2020 0.0.0.900 Modified plot.IL and plotmodelIL. Amended
+    fitDR, but still have to develop code to use the dose-response
+    curve. No Errors, Warnings, or Notes
+
 Malcolm Haddon
 
 Hobart, June 28, 2020

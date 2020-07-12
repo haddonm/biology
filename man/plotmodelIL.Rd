@@ -4,22 +4,36 @@
 \alias{plotmodelIL}
 \title{plotmodelIL plots out the model, data, and fit}
 \usage{
-plotmodelIL(x, outliers = FALSE, maxx = 0, ymin = -3, xmin = 0, defpar = FALSE)
+plotmodelIL(
+  x,
+  outliers = FALSE,
+  xmin = NA,
+  xmax = 0,
+  ymin = -3,
+  ymax = 0,
+  defpar = FALSE,
+  maintitle = ""
+)
 }
 \arguments{
 \item{x}{an IL object as produced by fitIL}
 
 \item{outliers}{identify outliers on the plot. Default = FALSE}
 
-\item{maxx}{The maximum value for the x axis. default=180}
+\item{xmin}{allows one to set the lower bound of the x-axis on growth plots.
+default=NA, which means it will be set automatically}
+
+\item{xmax}{The maximum value for the x axis. default=180}
 
 \item{ymin}{allows one to set the lower bound of the growth plots. Default=
 -3 as befits abalone}
 
-\item{xmin}{allows one to set the lower bound of the x-axis on growth plots.
-default=0}
+\item{ymax}{allow the setting of the upper bound on he y-axis. The default=0
+which means the maximum of x$DL,x$OutDL, or x$MaxDL will be used}
 
 \item{defpar}{should plot par values be used, default = FALSE}
+
+\item{maintitle}{default='', if a title required add it here.}
 }
 \value{
 nothing but does plot a graph
@@ -32,5 +46,6 @@ plotmodelIL plots the data, the model fit, and the
 \examples{
 data(midg)
 ans <- fitIL(midg,outliers=TRUE,sitename="Middle Ground")
-plotmodelIL(ans,outliers=TRUE,defpar=TRUE)
+plotmodelIL(ans,outliers=TRUE,defpar=TRUE,xmin=0)
+projtozero(ans)
 }

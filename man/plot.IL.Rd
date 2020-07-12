@@ -4,21 +4,34 @@
 \alias{plot.IL}
 \title{plot.IL an S3 method to plot an IL object}
 \usage{
-\method{plot}{IL}(x, outliers = FALSE, maxx = 0, miny = -3, minx = 0, nbreaks = 25, ...)
+\method{plot}{IL}(
+  x,
+  outliers = FALSE,
+  xmin = NA,
+  xmax = 0,
+  ymin = -3,
+  ymax = 0,
+  nbreaks = 25,
+  ...
+)
 }
 \arguments{
 \item{x}{an IL object from the fitIL function}
 
 \item{outliers}{identify outliers on the plot. Default = FALSE}
 
-\item{maxx}{allows one to set a particular maximum growth increment.
-default=0 so that ymax is set by the data}
+\item{xmin}{allows one to set the lower bound of the x-axis on growth plots.
+default=NA, which means it will be taken from the data. On ecannot set a 
+minimum greater than the minimum of the data}
 
-\item{miny}{allows one to set the lower bound of the growth plots. Default=
+\item{xmax}{allows one to set a particular maximum growth increment.
+default=0 so that xmax is set by the data.}
+
+\item{ymin}{allows one to set the lower bound of the growth plots. Default=
 -3 as befits abalone}
 
-\item{minx}{allows one to set the lower bound of the x-axis on growth plots.
-default=0}
+\item{ymax}{allows the setting of the largest y-axis value. defualt=0, which
+means it is set via the data}
 
 \item{nbreaks}{number of bins in the histogram of data density, default=25}
 
@@ -40,5 +53,6 @@ plot.IL is an S3 method for plotting the results of
 \examples{
 data(midg)
 ans <- fitIL(midg,outliers=TRUE,sitename="Middle Ground")
-plot(ans)
+plot(ans,outliers=TRUE)
+# x=ans; outliers=TRUE; xmin=NA; xmax=0;ymin=-2; ymax=0;nbreaks=25
 }
