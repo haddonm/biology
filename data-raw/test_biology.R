@@ -33,5 +33,5 @@ plotprep(width=7,height=6,newdev=FALSE)
 plot(boot,col=4)
 
 
-
+data(tasab)
 

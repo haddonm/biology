@@ -398,6 +398,9 @@ invlog <- function(p,Lt) {
 #'
 #' @return nothing but does add a line to a plot from plotmodelIL
 #' @export
+#' 
+#' @examples
+#' print("wait")
 projtozero <- function(ans) {
   x <- seq(0.1,ans$PredLt[1],0.1)
   y <- invlog(ans$model$estimate,x)

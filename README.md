@@ -38,6 +38,11 @@ Some details of the package can be found using
     fitDR, but still have to develop code to use the dose-response
     curve. No Errors, Warnings, or Notes
 
+  - 07/08/2020 0.0.0.850 developed the use of alternative dose response
+    curve, using two alternative functions for the standard deviation.
+    The first was constant and the second was an inverse relationship
+    with initial length.
+
 Malcolm Haddon
 
 Hobart, June 28, 2020

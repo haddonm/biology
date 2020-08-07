@@ -26,5 +26,5 @@ fitDR fits a dose response, as defined by Rogers-Bennett for
     Note well, this equation only works for annual data.
 }
 \examples{
-print("waiting to be developed")
+# Add a sd function to the arguments, default = constant sd 
 }

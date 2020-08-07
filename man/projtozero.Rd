@@ -23,3 +23,6 @@ projtozero extends the predicted inverse logistic derived from
 projtozero extends the predicted inverse logistic derived from
     fitIL to zero.
 }
+\examples{
+print("wait")
+}

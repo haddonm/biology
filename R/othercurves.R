@@ -72,7 +72,7 @@ doseR <- function(p,lens) {#
 #' @export
 #'
 #' @examples
-#' print("waiting to be developed")
+#' # Add a sd function to the arguments, default = constant sd 
 fitDR <- function(p,dat,Lt="Lt",DL="DL") { # p=c(1.46,12.0,6.5,0.5); dat=pdat;Lt="Lt";DL="DL"
   negLDR <- function(par,x,Lt,DL) { # par=p; x=pdat
     expDL <- doseR(p=par,x[,Lt])

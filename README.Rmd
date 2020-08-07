@@ -37,6 +37,8 @@ Some details of the package can be found using _packageDescription("biology")_.
 
 * 12/07/2020 0.0.0.900 Modified plot.IL and plotmodelIL. Amended fitDR, but still have to develop code to use the dose-response curve. No Errors, Warnings, or Notes
 
+* 07/08/2020 0.0.0.850 developed the use of alternative dose response curve, using two alternative functions for the standard deviation. The first was constant and the second was an inverse relationship with initial length.
+
 
 Malcolm Haddon
 

@@ -21,6 +21,13 @@ ab1$mature <- NA
 pick <- which((ab1[,"sex"] == "M") | (ab1[,"sex"] == "F"))
 ab1$mature[pick] <- 1
 ab1$mature[-pick] <- 0
+properties(ab1)
+
+
+
+
+
+
 
 
 sites <- sort(unique(ab1$site))   # change here
@@ -29,17 +36,18 @@ sitemth <- table(ab1$month,ab1$site)
 
 sitemth
 
-sit <- "Gardens"
+sit <- c("Gardens","George III Rock")
 
-pick <- which((ab1$site == sit) & (ab1$outlier == 0))
+pick <- which((ab1$site %in% sit) & (ab1$outlier == 0))
 sitdat <- droplevels(ab1[pick,])
 
-mthmat <- table(sitdat$month,sitdat$mature)
+mthmat <- table(sitdat$season,sitdat$mature,sitdat$site)
 mthmat
-mths <- as.numeric(rownames(mthmat))
-mthlab <- c("Jan","Apr","Aug","Nov")
+
+tapply(sitdat$meatwt,list(sitdat$site,sitdat$season),mean,na.rm=TRUE)
 
 
+# Fit and plot maturity curves to a single site---------------------------------
 plotprep(width=7,height=6,newdev=FALSE)
 parset(plots=c(2,2))
 for (i in 1:4) { # i=2
@@ -164,4 +172,96 @@ outg <- binglm(gmodel)
 byl <- as.matrix(table(alldat$length,alldat$mature))
 lens <- as.numeric(rownames(byl))
 propm <- byl[,2]/rowSums(byl)
+
+
+
+# relative condition through year---------------------------------------
+sit <- c("Gardens","George III Rock")
+
+pick <- which((ab1$site %in% sit) & (ab1$outlier == 0))
+sitdat <- droplevels(ab1[pick,])
+
+mthmat <- table(sitdat$season,sitdat$mature,sitdat$site)
+mthmat
+
+tapply(sitdat$meatwt,list(sitdat$site,sitdat$season),mean,na.rm=TRUE)
+
+
+
+sites <- sort(unique(sitdat$site))
+plotprep(width=7,height=5,newdev=FALSE)
+sit <- "Gardens"
+seas <- "Autumn"
+invar <- "shellwt"
+indep <- "length"
+pickM <- which(sitdat$season == seas)
+allsite <- droplevels(sitdat[pickM,])
+xrnge <- range(allsite$length)
+pickS <- which(allsite$site == sites[1])
+plot(allsite[pickS,indep],allsite[pickS,invar],type="p",pch=16,cex=1.0,
+     col=1,xlim=xrnge,panel.first=grid())
+points(allsite[-pickS,indep],allsite[-pickS,invar],pch=16,col=2,cex=1.0)
+
+
+# fix-up outliers in weights --------------------------------------------
+pickO <- which(ab1$outlier == 0)
+ab2 <- ab1[pickO,]
+
+pick <- which(ab2$length < 30)
+ab2[pick,"length"] <- 91; ab2[pick,"outlier"] <- 1
+pick <- which(ab2$meatwt > 400)
+ab2[pick,"meatwt"] <- 62.6; ab2[pick,"outlier"] <- 1
+pick <- which((ab2$length > 145) & (ab2$totwt < 200))
+ab2[pick,"outlier"] <- 1
+pick <- which((ab2$length < 50) & (ab2$totwt > 25))
+ab2[pick,"outlier"] <- 1
+pick <- which((ab2$length > 100) & (ab2$shellwt < 25))
+ab2[pick,"outlier"] <- 1
+pick <- which((ab2$length > 130) & (ab2$meatwt < 50))
+ab2[pick,"outlier"] <- 1
+pick <- which((ab2$length < 105) & (ab2$totwt > 200))
+ab2[pick,"outlier"] <- 1
+pick <- which((ab2$length >=80) & (ab2$length < 85) & (ab2$totwt >= 100))
+ab2[pick,]
+ab2[pick,"outlier"] <- 1
+
+
+
+pickO <- which(ab2$outlier == 0)
+ab2 <- ab2[pickO,]
+xrnge <- range(ab2$length)
+plotprep(width=7,height=7,newdev=FALSE)
+parset(plots=c(2,2))
+invar="totwt"
+plot(ab2[,indep],ab2[,invar],type="p",pch=16,cex=1.0,
+     col=1,xlim=xrnge,panel.first=grid(),ylab=invar)
+invar="shellwt"
+plot(ab2[,indep],ab2[,invar],type="p",pch=16,cex=1.0,
+     col=1,xlim=xrnge,panel.first=grid(),ylab=invar)
+invar="meatwt"
+plot(ab2[,indep],ab2[,invar],type="p",pch=16,cex=1.0,
+     col=1,xlim=xrnge,panel.first=grid(),ylab=invar)
+invar="viscwt"
+plot(ab2[,indep],ab2[,invar],type="p",pch=16,cex=1.0,
+     col=1,xlim=xrnge,panel.first=grid(),ylab=invar)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
