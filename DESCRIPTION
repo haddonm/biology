@@ -1,7 +1,7 @@
 Package: biology
 Title: Aids Fitting curves to growth and maturity Data
-Version: 0.0.0.850
-Date: 2020-08-07
+Version: 0.0.0.800
+Date: 2020-08-09
 Authors@R: person("Malcolm", "Haddon", role = c("aut", "cre"), 
                   email = "malcolm.haddon@gmail.com")
 Maintainer: Malcolm Haddon <malcolm.haddon@gmail.com>

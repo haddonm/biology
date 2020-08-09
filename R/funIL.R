@@ -171,6 +171,8 @@ fitIL.data.frame <- function(x, ...) {
 #' @param outliers default = FALSE, should outliers be identified and
 #'     then omitted?
 #' @param sitename an alphanumeric identifier for the site
+#' @param predSD what function to use to generate predicted sd, 
+#'     default= parsin[4] x expDL
 #' @param ... the ellipsis is for any remaining parameters
 #'
 #' @return returns an IL curve fit as a class IL object
@@ -180,7 +182,7 @@ fitIL.data.frame <- function(x, ...) {
 #' data(midg)
 #' ans <- fitIL(midg$Lt,midg$DL,sitename="Middle Ground")
 #' str(ans)
-fitIL.default <- function(x, y, siteid=0,outliers=FALSE,sitename="",...) {
+fitIL.default <- function(x, y, siteid=0,outliers=FALSE,sitename="",predSD="",...) {
   negLIL <- function(parsin) {
     expDL <- invlog(p=parsin,x)
     expSD <- invlog(p=c(parsin[4],parsin[3],parsin[3]/0.95),x)

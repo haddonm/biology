@@ -4,7 +4,7 @@
 \alias{fitIL.default}
 \title{fitIL.default the default S3 method to apply fitIL}
 \usage{
-\method{fitIL}{default}(x, y, siteid = 0, outliers = FALSE, sitename = "", ...)
+\method{fitIL}{default}(x, y, siteid = 0, outliers = FALSE, sitename = "", predSD = "", ...)
 }
 \arguments{
 \item{x}{a vector containing Lt the names must be exact}
@@ -17,6 +17,9 @@
 then omitted?}
 
 \item{sitename}{an alphanumeric identifier for the site}
+
+\item{predSD}{what function to use to generate predicted sd, 
+default= parsin[4] x expDL}
 
 \item{...}{the ellipsis is for any remaining parameters}
 }

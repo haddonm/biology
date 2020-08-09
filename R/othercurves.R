@@ -55,48 +55,66 @@ doseR <- function(p,lens) {#
   return(ans)
 } # end of doseR
 
-#' @title fitDR fits a dose response model to tagging data using Normal errors
-#'
-#' @description fitDR fits a dose response, as defined by Rogers-Bennett for
-#'     tagging data in Rogers-Bennett et al (2003). DeltaL <- a/(1 + ((L/b)^c)).
-#'     Note well, this equation only works for annual data.
-#'
-#' @param p the parameters a, b, c, and sigma the sd for mormally distributed
-#'     residual errors
+#' @title fitgrow fits a tagging growth model to tagging data
+#' 
+#' @description fitgrow fits a selected tagging growth model to a set of 
+#'     initial lengths and consequent growth increments. It requires the growth 
+#'     model function to be input as a function argument as well as another 
+#'     function, as a second argument, that is used to describe how the variance
+#'     is expected to change with the changing predicted growth increments. The
+#'     function uses negLLG to calculate the negative log-likelihoods
+#'      
+#' @param p the parameters a, b, c, sigma, and tau
+#' @param grow the function describing the growth function used
+#' @param sdfunc the function describing the sd vs predicted DL
 #' @param dat a data.frame containing at least Lt (initial length) and DL (delta
-#'     L)
-#' @param Lt the name of the initial length data
-#' @param DL the name of the increment in length data
-#'
-#' @return a list of results
+#'     L) in columns 1 and 2
+#' 
+#' @return the fitted model output from the nlm function 
 #' @export
 #'
 #' @examples
-#' # Add a sd function to the arguments, default = constant sd 
-fitDR <- function(p,dat,Lt="Lt",DL="DL") { # p=c(1.46,12.0,6.5,0.5); dat=pdat;Lt="Lt";DL="DL"
-  negLDR <- function(par,x,Lt,DL) { # par=p; x=pdat
-    expDL <- doseR(p=par,x[,Lt])
-    expSD <- p[4]
-    neglogl <- -sum(dnorm(x[,DL],expDL,expSD,log=T))
-    return(neglogl)
-  }
-  best <- optim(p,negLDR,x=dat,method="Nelder-Mead",
+#' print("waiting to be developed")     
+fitgrow <- function(p,grow,sdfunc,dat) { # p=c(1.46,12.0,6.5,0.5); dat=pdat;Lt="Lt";DL="DL"
+  best <- optim(p,negLLG,grow=grow,sdfunc=sdfunc,x=dat,method="Nelder-Mead",
                 hessian=FALSE,
                 control=list(trace=0, maxit=1000))
-  parsin <- best$par
-  mod <- nlm(negLDR,parsin,x=dat,hessian=T, gradtol = 1e-7)
-  parout <- mod$estimate
-  a <- mod$estimate[1]
-  b <- mod$estimate[2]
-  c <- mod$estimate[3]
-  sigma <- mod$estimate[4]
-  predDL <- doseR(parout,dat[,Lt])
-  ssq <- sum((dat[,DL] - predDL)^2,na.rm=TRUE)
-  ans <- list(model=mod,negLL=mod$minimum,ssq=ssq,optimum=parout,
-              a=a,b=b,c=c,sigma=sigma)
-  return(ans)
-} # end of fitDR
+  mod <- nlm(negLLG,best$par,grow=grow,sdfunc=sdfunc,x=dat,hessian=T, gradtol = 1e-7)
+  return(mod)
+} # end of fitgrow
 
+#' @title negLLG calculates the negative log-likelihood for growth models
+#' 
+#' @description negLLG is a general function for calculating the negative log-
+#'     likelihood using additive normal random errors for tagging based growth 
+#'     models defined in the functions 'grow' and 'sdfunc'. The 'grow' 
+#'     argument must be a function that defines the expected growth increments 
+#'     given two input arguments 'p' and 'Lt', where p is the vector of 
+#'     parameters, and 'x' (or whatever) is a vector of initial lengths. The
+#'     sdfunc is a function that defines the description of the standard 
+#'     deviation around the predicted growth increments. A penalty is imposed on
+#'     parameter[2], which is often L50 to avoid negative numbers
+#' @param p the vector of parameters, what these are will depend on both grow
+#'     and sdfunc 
+#' @param grow the function describing the growth function used
+#' @param sdfunc the function describing the sd vs predicted DL
+#' @param x a data.frame or matrix containing at least Lt (initial length) 
+#'     and DL (deltaL) in columns 1 and 2
+#'     
+#' @return a single number, the negative log-likelihood
+#' @export    
+#'     
+#' @examples 
+#'  pars <- c(2.2,9.5,5,0.6,1)
+#'  dat <- NULL  # wait on internal dataset
+#'  # negLLG(p=pars,grow=invlog,sdfunc=sdpow)
+negLLG <- function(p,grow,sdfunc,x) { # par=p; x=pdat
+  expDL <- grow(p=p,x[,1])
+  expSD <- sdfunc(p=p,expDL)
+  neglogl <- -sum(dnorm(x[,2],expDL,expSD,log=T))
+  neglogl <- neglogl + 100*exp(-1000*p[2])
+  return(neglogl)
+}
 
 #' @title outIL provides a tidy summary of the output from fitIL
 #'
@@ -163,3 +181,23 @@ projtozero <- function(ans) {
   lines(x,y,lwd=2,col=3)
 } #end of projtozero
 
+#' @title sdpow a power relationship used to describe the changing variance
+#' 
+#' @description sdpow a power relationship p[4]*predDL^p[5] used to describe
+#'     how the standard deviation to be used when estimating normal likelihoods
+#'     changes relative to the predicted growth increment
+#'
+#' @param p the vector of parameters, what these are will depend on both grow
+#'     and sdfunc 
+#' @param predDL the predicted DeltaL derived from some growth function
+#'
+#' @return a vector of standard deviations the same length as predDL
+#' @export
+#'
+#' @examples
+#'  pars <- c(2.2,9.5,5,0.6,1)
+#'  dat <- NULL  # wait on internal dataset
+#'  # negLLG(p=pars,grow=invlog,sdfunc=sdpow)
+sdpow <- function(p,predDL) {
+  return(p[4] * predDL ^ p[5])
+}

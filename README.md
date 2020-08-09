@@ -43,6 +43,12 @@ Some details of the package can be found using
     The first was constant and the second was an inverse relationship
     with initial length.
 
+  - 09/08/2020 0.0.0.800 Implemented a general funciton for fitting
+    growth curves to taggign growth data. It needs a function to define
+    which growth fucntion should be fitted, and a function to describe
+    how the variance around the predicted growth increments should
+    change as the predicted growth increments change.
+
 Malcolm Haddon
 
 Hobart, June 28, 2020

@@ -1,12 +1,12 @@
 # If confused contact malcolm@haddon.net.au or 0409 941 891
 
 # run the next 4 lines only once )though it wouldn't matter if it was repeated
-
-if (!require(devtools)){install.packages("devtools")} 
-devtools::install_github("https://github.com/haddonm/rutilsMH")
-devtools::install_github("https://github.com/haddonm/biology")
-devtools::install_github("https://github.com/haddonm/makehtml")
-
+# 
+# if (!require(devtools)){install.packages("devtools")} 
+# devtools::install_github("https://github.com/haddonm/rutilsMH")
+# devtools::install_github("https://github.com/haddonm/biology")
+# devtools::install_github("https://github.com/haddonm/makehtml")
+# 
 
 # The run proper----------------------------------------------------------------
 library(rutilsMH)    # All three available from www.github.com/haddonm.
@@ -109,12 +109,6 @@ pick <- which(gdat$site == "Maria")
 dat <- droplevels(gdat[pick,])
 
 
-lens <- seq(1,130,1)
-maxL <- 5.0
-L50 <- 60.0
-invl <- invlog(c(maxL,L50,100),lens)
-DR <- doseR(c(maxL,L50,4),lens)
-
 
 initparDR <- function(Lt,DL) {
   pars <- numeric(4)
@@ -141,7 +135,7 @@ initparDR <- function(Lt,DL) {
 #' @param sitename an alphanumeric identifier for the site
 #' @param ...	the ellipsis is for any remaining parameters
 fitDR <- function(x, y, siteid=0,outliers=FALSE,sitename="",...) {
- 
+}
   x <- cbind(dat$Lt,dat$DL)
   x <- x[order(x[,1]),]
   siteid=0
@@ -156,12 +150,20 @@ fitDR <- function(x, y, siteid=0,outliers=FALSE,sitename="",...) {
     return(neglogl)
   } # constant sd with length
   
-  negLDRIL <- function(parsin) { # parsin = pars
+  negLDRCL <- function(parsin) { # parsin = pars
     expDL <- doseR(p=parsin,x[,1])
-    expSD <- parsin[4]/x[,1]
+    expSD <- parsin[4] * expDL
     neglogl <- -sum(dnorm(x[,2],expDL,expSD,log=T))
     return(neglogl)
   } # inverse decrease in sd with length
+  
+  negLDRPL <- function(parsin) { # parsin = pars
+    expDL <- doseR(p=parsin,x[,1])
+    expSD <- parsin[4] * expDL ^ parsin[5]
+    neglogl <- -sum(dnorm(x[,2],expDL,expSD,log=T))
+    return(neglogl)
+  } # inverse decrease in sd with length
+  
   
   negLILC <- function(parsin) {  # 
     pars <- exp(parsin)
@@ -185,20 +187,29 @@ fitDR <- function(x, y, siteid=0,outliers=FALSE,sitename="",...) {
     return(neglogl)
   } # inverse logistic sd with length
   
+  negLIL2 <- function(parsin) {
+    expDL <- invlog(p=parsin,x[,1])
+    expSD <- parsin[4] * expDL ^ parsin[5]
+    neglogl <- -sum(dnorm(x[,2],expDL,expSD,log=T))
+    return(neglogl)
+  }
+  
+  
+  
   
   x <- cbind(dat$Lt,dat$DL)
   x <- x[order(x[,1]),]
-  predLt <- seq(6,19,0.2)  
+  predLt <- seq(0,19,0.2)  
   # dose response
-  pars <- c(2.2,9.5,5,3)
+  pars <- c(2.2,9.5,5,0.6,1)
  # pars <- log(pars)
-  best <- optim(pars,negLDRIL,method="Nelder-Mead",
+  best <- optim(pars,negLDRPL,method="Nelder-Mead",
                 hessian=FALSE,
                 control=list(trace=0, maxit=1000))
   # inverse logistic
-  pars2 <- c(2.1,9.52,17.5,2.5)
+  pars2 <- c(2.1,9.52,17.5,0.6,1)
  # pars2 <- log(pars2)
-  best2 <- optim(pars2,negLILIL,method="Nelder-Mead",
+  best2 <- optim(pars2,negLIL2,method="Nelder-Mead",
                 hessian=FALSE,
                 control=list(trace=0, maxit=1000))
 
@@ -208,25 +219,37 @@ fitDR <- function(x, y, siteid=0,outliers=FALSE,sitename="",...) {
   best2$value 
   abs(best$value - best2$value)
   
-  projzero <- function(funk,pars,first,col=3,...) {
+  projzero <- function(funk,pars,first,col=3,addline=TRUE,...) {
     # funk=doseR; pars=exp(best$par); first=x[1,1]; col=4
     Lt <- seq(0.1,first,0.1)
     y <- funk(pars,Lt)
-    lines(Lt,y,lwd=2,col=col)
+    if (addline) lines(Lt,y,lwd=2,col=col)
+    return(invisible(y))
   }
+  
+  
   
   plotprep(width=7,height=4,newdev = FALSE)
   xmax <- getmax(x[,1])
-  plot(x[,1],x[,2],type="p",pch=16,cex=1.0,panel.first=grid,xlim=c(0,xmax),
-       xlab="Length at Tagging",ylab="Growth Increment")
-  lines(predLt,doseR(best$par,predLt),lwd=2,col=4)
-  lines(predLt,invlog(best2$par,predLt),lwd=2,col=2)
+  plot(x[,1],x[,2],type="p",pch=16,cex=1.0,panel.first=grid(),xlim=c(0,xmax),
+       xlab="Length at Tagging",ylab="Growth Increment",ylim=c(0,7),)
+  predDR <- doseR(best$par,predLt)
+  predDRsd <- best$par[4] * predDR
+  lines(predLt,predDR,lwd=2,col=4)
+  predIL <- invlog(best2$par,predLt) 
+  predILsd <- best2$par[4] * predIL ^ best2$par[5]
+  lines(predLt,predIL,lwd=2,col=2)
   legend("topright",legend=c("InvLog","DoseR"),col=c(2,4),lwd=3,bty="n",cex=1.5)
-  projzero(doseR,best$par,x[1,1],col=4)
-  projzero(invlog,best2$par,x[1,1],col=2)
+  # projzero(doseR,best$par,x[1,1],col=4)
+  # projzero(invlog,best2$par,x[1,1],col=2)
+  lines(predLt,(predIL + 1.96*predILsd),lwd=1,col=2)
+  lines(predLt,(predIL - 1.96*predILsd),lwd=1,col=2)
+  lines(predLt,(predDR + 1.96*predDRsd),lwd=1,col=4) 
+  lines(predLt,(predDR - 1.96*predDRsd),lwd=1,col=4) 
   
   
-
+  
+  
   
   plotprep(width=7,height=4,newdev = FALSE)
   xmax <- getmax(x[,1])
@@ -241,66 +264,58 @@ fitDR <- function(x, y, siteid=0,outliers=FALSE,sitename="",...) {
   
   
   
-  parsin <- initpars(x,y)
-  best <- optim(parsin,negLIL,method="Nelder-Mead",
-                hessian=FALSE,
-                control=list(trace=0, maxit=1000))
-  parsin <- best$par
-  mod <- nlm(negLIL,parsin,hessian=T, gradtol = 1e-7)
-  parsin <- mod$estimate
-  MaxDL <- mod$estimate[1]
-  L50 <- mod$estimate[2]
-  L95 <- mod$estimate[3]
-  MaxSig <- mod$estimate[4]
-  xout <- NULL  # will contain the list of outliers if one exists
-  yout <- NULL
-  L50out <- NULL
-  L95out <- NULL
-  MaxDLout <- NULL
-  MaxSigout <- NULL
-  if (outliers) {
-    L50out <- L50
-    L95out <- L95
-    MaxDLout <- MaxDL
-    MaxSigout <- MaxSig
-    expDL <-  invlog(c(MaxDL,L50,L95),x)
-    resids <- abs(y - expDL)
-    expSD <- invlog(c(MaxSig,L95,(L95/0.95)),x)
-    outers <- resids - 2.576*expSD   #99% confidence limits
-    pick <- which(outers > 0)
-    if ((length(pick) > 0)==TRUE) {
-      xout <- x[pick]
-      yout <- y[pick]
-      x <- x[-pick]
-      y <- y[-pick]
-    }
-    best <- optim(parsin,negLIL,method="Nelder-Mead",
-                  hessian=FALSE,
-                  control=list(trace=0, maxit=2000))
-    parsin <- best$par
-    mod <- nlm(negLIL,parsin,hessian=T, gradtol = 1e-7)
-    MaxDL <- mod$estimate[1]
-    L50 <- mod$estimate[2]
-    L95 <- mod$estimate[3]
-    MaxSig <- mod$estimate[4]
-  }
-  Ltrg <- range(x,na.rm=T)
-  xmin <- min(Ltrg[1],50)
-  xmax <- max(Ltrg[2],180)
-  predLt <- seq(xmin,xmax,1)
-  predDL <- invlog(c(MaxDL,L50,L95),predLt)
-  expDL <-  invlog(c(MaxDL,L50,L95),x)
-  resids <- y - expDL
-  Nobs <- length(x)
-  ans <- list(mod,MaxDL,L50,L95,MaxSig,predLt,predDL,resids,Nobs,x,y,xout,
-              yout,L50out,L95out,MaxDLout,MaxSigout,siteid,sitename)
-  names(ans) <- c("model","MaxDL","L50","L95","MaxSig","PredLt",
-                  "PredDL","resids","Nobs","Lt","DL","OutLt","OutDL","L50out",
-                  "L95out","MaxDLout","MaxSigout","siteid","sitename")
-  class(ans) <- "IL"
-  return(ans)
-}
+# generalize the model fitting--------------------------------------------------  
+  pick <- which(gdat$site == "Huon")
+  sitedat <- droplevels(gdat[pick,])
+  dat <- sitedat[,c("Lt","DL")]
+  dat <- dat[order(dat[,1]),]
+  dim(dat)
 
+
+
+  predLt <- seq(0,17,0.2)  
+  
+  
+  pars <- c(2.1,9.52,17.5,0.6,1)
+
+  invl <- fitgrow(p=pars,grow=invlog,sdfunc=sdpow,dat=dat)
+  
+  pars <- c(2.2,9.5,5,0.6,1)
+  dr <- fitgrow(p=pars,grow=doseR,sdfunc=sdpow,dat=dat)
+  
+  
+  
+  outfit(invl,title="Inverse Logistic",backtran = FALSE)
+  outfit(dr,title="dose response",backtran = FALSE)
+  
+  
+  dr$estimate
+  invl$estimate  
+  dr$minimum
+  invl$minimum 
+  abs(dr$minimum - invl$minimum)
+  
+  plotprep(width=7,height=4,newdev = FALSE)
+  xmax <- getmax(dat[,1])
+  plot(dat[,1],dat[,2],type="p",pch=16,cex=1.0,panel.first=grid(),xlim=c(0,xmax),
+       xlab="Length at Tagging",ylab="Growth Increment",ylim=c(0,4.5),)
+  predDR <- doseR(dr$estimate,predLt)
+  predDRsd <- dr$estimate[4] * predDR ^ dr$estimate[5]
+  lines(predLt,predDR,lwd=2,col=4)
+  predIL <- invlog(invl$estimate,predLt) 
+  predILsd <- invl$estimate[4] * predIL ^ invl$estimate[5]
+  lines(predLt,predIL,lwd=2,col=2)
+  legend("topright",legend=c("InvLog","DoseR"),col=c(2,4),lwd=3,bty="n",cex=1.5)
+  lines(predLt,(predIL + 1.96*predILsd),lwd=1,col=2)
+  lines(predLt,(predIL - 1.96*predILsd),lwd=1,col=2)
+  lines(predLt,(predDR + 1.96*predDRsd),lwd=1,col=4) 
+  lines(predLt,(predDR - 1.96*predDRsd),lwd=1,col=4) 
+  
+  
+  
+  
+  
+ 
 
 
 
