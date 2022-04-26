@@ -22,7 +22,8 @@ options("show.signif.stars"=FALSE,
 ```
 
 ```{r setup}
-library(rutilsMH)
+library(hutils)
+library(hplot)
 library(biology)
 ```
 
@@ -110,6 +111,10 @@ Maturation is a process where one expects to see a gradual increase in the propo
 
 
 
+
+# References
+
+Haddon, M., Mundy, C., and D. Tarbath (2008) Using an inverse-logistic model to describe growth increments of blacklip abalone (_Haliotis rubra_) in Tasmania. _Fishery Bulletin_ __106__:58-71
 
 
 

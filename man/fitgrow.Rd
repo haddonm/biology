@@ -4,7 +4,7 @@
 \alias{fitgrow}
 \title{fitgrow fits a tagging growth model to tagging data}
 \usage{
-fitgrow(p, grow, sdfunc, dat)
+fitgrow(p, grow, sdfunc, dat, hessian = FALSE)
 }
 \arguments{
 \item{p}{the parameters a, b, c, sigma, and tau}
@@ -15,6 +15,8 @@ fitgrow(p, grow, sdfunc, dat)
 
 \item{dat}{a data.frame containing at least Lt (initial length) and DL (delta
 L) in columns 1 and 2}
+
+\item{hessian}{should the hessian be generated? default=FALSE}
 }
 \value{
 the fitted model output from the nlm function

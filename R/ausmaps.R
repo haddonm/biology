@@ -140,6 +140,7 @@ getlatlon <- function(x,lat="lat",lon="long",site="site") {
 #' @param lat2 The second latitude in decimal degrees
 #' @param lon2 The second longitude in decimal degrees
 #' 
+#' 
 #' @return a vector of the polar, volumetric, and equatorial distances
 #' @export
 #'

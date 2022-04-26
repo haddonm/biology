@@ -29,21 +29,24 @@ the objects output by, say, *fitIL*, you can use, for example,
 Some details of the package can be found using
 *packageDescription(“biology”)*.
 
-  - 28/06/2020 Initial combination of the older packages invLogistic and
+-   26/04/2022 Added many functions assisting the fitting of maturity
+    curves
+
+-   28/06/2020 Initial combination of the older packages invLogistic and
     maturity.
 
-  - 04/07/2020 added extra functionality for plots and analyses.
+-   04/07/2020 added extra functionality for plots and analyses.
 
-  - 12/07/2020 0.0.0.900 Modified plot.IL and plotmodelIL. Amended
+-   12/07/2020 0.0.0.900 Modified plot.IL and plotmodelIL. Amended
     fitDR, but still have to develop code to use the dose-response
     curve. No Errors, Warnings, or Notes
 
-  - 07/08/2020 0.0.0.850 developed the use of alternative dose response
+-   07/08/2020 0.0.0.850 developed the use of alternative dose response
     curve, using two alternative functions for the standard deviation.
     The first was constant and the second was an inverse relationship
     with initial length.
 
-  - 09/08/2020 0.0.0.800 Implemented a general funciton for fitting
+-   09/08/2020 0.0.0.800 Implemented a general funciton for fitting
     growth curves to taggign growth data. It needs a function to define
     which growth fucntion should be fitted, and a function to describe
     how the variance around the predicted growth increments should

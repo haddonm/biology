@@ -4,7 +4,7 @@
 \alias{negLLG}
 \title{negLLG calculates the negative log-likelihood for growth models}
 \usage{
-negLLG(p, grow, sdfunc, x)
+negLLG(p, grow, sdfunc, x, pen = TRUE)
 }
 \arguments{
 \item{p}{the vector of parameters, what these are will depend on both grow
@@ -16,6 +16,8 @@ and sdfunc}
 
 \item{x}{a data.frame or matrix containing at least Lt (initial length) 
 and DL (deltaL) in columns 1 and 2}
+
+\item{pen}{a penalty to keep p[2] positive. default = TRUE}
 }
 \value{
 a single number, the negative log-likelihood

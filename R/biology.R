@@ -3,8 +3,9 @@
 #' @importFrom grDevices palette rgb
 #' @importFrom graphics abline grid hist lines mtext par plot points
 #' @importFrom graphics text title legend polygon
-#' @importFrom stats dnorm nlm optim quantile sd coef
-#' @importFrom rutilsMH getmax getmin setpalette
+#' @importFrom stats dnorm nlm optim quantile sd coef binomial glm
+#' @importFrom hutils getmax getmin
+#' @importFrom hplot parset pickbound plotprep
 NULL
 
 
@@ -29,7 +30,7 @@ NULL
 #' @references Haddon, M., Mundy, C., and D. Tarbath (2008) Using an
 #'     inverse-logistic model to describe growth increments of blacklip
 #'     abalone (\emph{Haliotis rubra}) in Tasmania. \emph{Fishery Bulletin}
-#'     106: 58-71.
+#'     \bold{106}: 58-71.
 #'
 #' @section Plotting and printing functions:
 #' \describe{

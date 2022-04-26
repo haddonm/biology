@@ -14,7 +14,7 @@ binglm(x, digits = 6, console = TRUE)
 \item{console}{should the result be printed to the console, default=TRUE}
 }
 \value{
-the summary of the model (invisibly)
+the summary of the model and the parameters (invisibly)
 }
 \description{
 binglm should really be an S3 method for binomial GLM

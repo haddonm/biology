@@ -1,10 +1,9 @@
 Package: biology
 Title: Aids Fitting curves to growth and maturity Data
-Version: 0.0.0.800
-Date: 2020-08-09
+Version: 0.0.0.600
+Date: 2022-04-26
 Authors@R: person("Malcolm", "Haddon", role = c("aut", "cre"), 
                   email = "malcolm.haddon@gmail.com")
-Maintainer: Malcolm Haddon <malcolm.haddon@gmail.com>
 Description: Aids in fitting growth curves to invertebrate tagging data, 
     particularly the Inverse Logistic, but also the dose-response curve and the
     Michaelis-Menton curve. In addition, it faciliatates fitting maturity-at- 
@@ -14,9 +13,9 @@ Depends: R (>= 3.5.0)
 License: MIT + file LICENSE 
 Encoding: UTF-8
 LazyData: true
-Imports: rutilsMH,
-    MASS,
-    mvtnorm
+Imports: 
+    hutils,
+    hplot
 Suggests: 
     knitr,
     rmarkdown

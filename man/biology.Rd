@@ -68,5 +68,5 @@ The biology package provides functions to facilitate
 Haddon, M., Mundy, C., and D. Tarbath (2008) Using an
     inverse-logistic model to describe growth increments of blacklip
     abalone (\emph{Haliotis rubra}) in Tasmania. \emph{Fishery Bulletin}
-    106: 58-71.
+    \bold{106}: 58-71.
 }

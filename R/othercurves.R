@@ -27,7 +27,7 @@
 #' b <- -0.1
 #' lens <- seq(1,130,1)
 #' growthinc <- classicalL(c(maxDL,a,b),lens)
-classicalL <- function(p,lens) {
+classicalL <- function(p,lens) { # p=c(6,7,-1.5,1,1); lens=
   ans <- p[1]*exp(p[2]+p[3]*lens)/(1+exp(p[2]+p[3]*lens))
   return(ans)
 } # end of classicalL
@@ -69,17 +69,19 @@ doseR <- function(p,lens) {#
 #' @param sdfunc the function describing the sd vs predicted DL
 #' @param dat a data.frame containing at least Lt (initial length) and DL (delta
 #'     L) in columns 1 and 2
+#' @param hessian should the hessian be generated? default=FALSE
 #' 
 #' @return the fitted model output from the nlm function 
 #' @export
 #'
 #' @examples
 #' print("waiting to be developed")     
-fitgrow <- function(p,grow,sdfunc,dat) { # p=c(1.46,12.0,6.5,0.5); dat=pdat;Lt="Lt";DL="DL"
+fitgrow <- function(p,grow,sdfunc,dat,hessian=FALSE) { # p=c(1.46,12.0,6.5,0.5); dat=pdat;Lt="Lt";DL="DL"
   best <- optim(p,negLLG,grow=grow,sdfunc=sdfunc,x=dat,method="Nelder-Mead",
-                hessian=FALSE,
+                hessian=hessian,
                 control=list(trace=0, maxit=1000))
-  mod <- nlm(negLLG,best$par,grow=grow,sdfunc=sdfunc,x=dat,hessian=T, gradtol = 1e-7)
+  mod <- nlm(negLLG,best$par,grow=grow,sdfunc=sdfunc,x=dat,hessian=hessian, 
+             gradtol = 1e-7)
   return(mod)
 } # end of fitgrow
 
@@ -100,6 +102,7 @@ fitgrow <- function(p,grow,sdfunc,dat) { # p=c(1.46,12.0,6.5,0.5); dat=pdat;Lt="
 #' @param sdfunc the function describing the sd vs predicted DL
 #' @param x a data.frame or matrix containing at least Lt (initial length) 
 #'     and DL (deltaL) in columns 1 and 2
+#' @param pen a penalty to keep p[2] positive. default = TRUE
 #'     
 #' @return a single number, the negative log-likelihood
 #' @export    
@@ -108,11 +111,11 @@ fitgrow <- function(p,grow,sdfunc,dat) { # p=c(1.46,12.0,6.5,0.5); dat=pdat;Lt="
 #'  pars <- c(2.2,9.5,5,0.6,1)
 #'  dat <- NULL  # wait on internal dataset
 #'  # negLLG(p=pars,grow=invlog,sdfunc=sdpow)
-negLLG <- function(p,grow,sdfunc,x) { # par=p; x=pdat
+negLLG <- function(p,grow,sdfunc,x,pen=TRUE) { # par=p; x=pdat
   expDL <- grow(p=p,x[,1])
   expSD <- sdfunc(p=p,expDL)
   neglogl <- -sum(dnorm(x[,2],expDL,expSD,log=T))
-  neglogl <- neglogl + 100*exp(-1000*p[2])
+  if (pen) neglogl <- neglogl + 100*exp(-1000*p[2])
   return(neglogl)
 }
 
