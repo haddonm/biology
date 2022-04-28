@@ -26,6 +26,6 @@ print("wait on internal data sets")
 }
 \seealso{
 {
-   \link{getloc}, \link{comparetwosites}
+   \link{getloc}, \link{comparetwogroups}
 }
 }

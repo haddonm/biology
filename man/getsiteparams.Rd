@@ -18,7 +18,7 @@ column name = 'site'}
 immature = 0}
 }
 \value{
-a list containin ga matrix of the site parameters and a list of all
+a list containing a matrix of the site parameters and a list of all
     the model fits used (called allfit)
 }
 \description{

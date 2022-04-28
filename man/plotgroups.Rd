@@ -11,7 +11,8 @@ plotgroups(
   xmax = 0,
   sitecol = "site",
   length = "length",
-  mat10 = "mature"
+  mat10 = "mature",
+  margin = c(0.4, 0.4, 0.05, 0.05)
 )
 }
 \arguments{
@@ -30,6 +31,9 @@ column name = 'site'}
 
 \item{mat10}{column name for the maturity variable in samdat mature=1,
 immature = 0}
+
+\item{margin}{what margin should be used in the plot? 
+default=c(0.4,0.4,0.05,0.05)}
 }
 \value{
 an invisible list containing the parameters and the fitmaturity 

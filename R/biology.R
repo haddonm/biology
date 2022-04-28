@@ -3,8 +3,8 @@
 #' @importFrom grDevices palette rgb
 #' @importFrom graphics abline grid hist lines mtext par plot points
 #' @importFrom graphics text title legend polygon
-#' @importFrom stats dnorm nlm optim quantile sd coef binomial glm
-#' @importFrom hutils getmax getmin
+#' @importFrom stats dnorm nlm optim quantile sd coef binomial glm anova
+#' @importFrom hutils getmax getmin makelabel
 #' @importFrom hplot parset pickbound plotprep
 NULL
 

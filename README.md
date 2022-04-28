@@ -29,6 +29,9 @@ the objects output by, say, *fitIL*, you can use, for example,
 Some details of the package can be found using
 *packageDescription(“biology”)*.
 
+-   28/04/2022 added further functions to assist with working with
+    groups of sites.
+
 -   26/04/2022 Added many functions assisting the fitting of maturity
     curves
 
