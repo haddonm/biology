@@ -27,8 +27,8 @@ column name = 'site'}
 immature = 0}
 }
 \value{
-an invisible list containing the regression results, the parameters,
-    and the plotdata
+an invisible list containing the regression results, the model,
+    the parameters, and the plotdata
 }
 \description{
 fitmaturity uses data of the form maturity = 1 immaturity = 0,

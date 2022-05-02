@@ -17,7 +17,8 @@ column name = 'site'}
 }
 \value{
 a list of nsites, siteproperties, site maturity parameters, the 
-    fitted models, and the tentative groups
+    fitted models, the tentative groups, and the selected data fro mteh input 
+    data.frame
 }
 \description{
 analysegroups uses a block and a data.frame of maturity data to

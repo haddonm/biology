@@ -36,7 +36,8 @@ default=0.05}
 }
 \value{
 a list of the anova between the models with and without group/site,
-    the significance of any difference, model1, model2, and their summaries
+    the significance of any difference, model1, model2, and the outputs from
+    applying binglm to each model
 }
 \description{
 comparetwogroups using logistic regressions to compare whether 
@@ -45,11 +46,11 @@ comparetwogroups using logistic regressions to compare whether
 }
 \examples{
 print("wait on internal data sets")
-# site1=c(784,459,500);site2=c(499); sitecol="site";samdat=samb;
-# length="length";mat10="mature"
+# grp1=g1;grp2=g2; sitecol="site";samdat=samb;
+# length="length";mat10="mature"; sigdiff=0.05
 }
 \seealso{
 {
-   \link{getloc}, \link{siteprops}
+   \link{getloc}, \link{siteprops}, \link{binglm}
 }
 }

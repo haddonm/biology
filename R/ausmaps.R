@@ -128,20 +128,22 @@ getlatlon <- function(x,lat="lat",lon="long",site="site") {
 #' @title haversine calculates the distance between two lat-lon pairs
 #' 
 #' @description haversine uses the Haversine formula to calculate the
-#'     great circle distance between two pairsa of lat-lon values. No
-#'     projection is used so this is only useful for poitns close 
+#'     great circle distance between two pairs of lat-lon values. No
+#'     projection is used so this is only useful for points close 
 #'     together on the Earth's surface. In addition, it uses a NASA
 #'     estimate of the volumetric radius of the Earth (6371). The radius
 #'     estimate at the equator is 6378.137 and that of the polar radius
-#'     is 6356.752. It produces a vector of all three of these values.
+#'     is 6356.752. It produces a vector of all three of these values. The 
+#'     differences tend to be minor so for biological samples the central 
+#'     volumetric value should suffice.
 #'     
 #' @param lat1 The first latitude in decimal degrees
 #' @param lon1 The first longitude in decimal degrees
 #' @param lat2 The second latitude in decimal degrees
 #' @param lon2 The second longitude in decimal degrees
-#' 
-#' 
-#' @return a vector of the polar, volumetric, and equatorial distances
+#' #' 
+#' @return a vector of the polar, volumetric, and equatorial distances as 
+#'     kilometres.
 #' @export
 #'
 #' @examples

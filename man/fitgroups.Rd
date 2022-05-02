@@ -13,7 +13,7 @@ fitgroups(
 )
 }
 \arguments{
-\item{groups}{a list containing vecotrs of site numbers}
+\item{groups}{a list containing vectors of site numbers}
 
 \item{samdat}{a data.frame of maturity data containing the required site(s)}
 

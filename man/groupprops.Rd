@@ -4,23 +4,21 @@
 \alias{groupprops}
 \title{groupprops tabulates the properties of each site number}
 \usage{
-groupprops(site1, site2, samdat, sitecol = "site")
+groupprops(grp, samdat, groupname = "grp", sitecol = "site")
 }
 \arguments{
-\item{site1}{a vector of at least one site number to be found in the 
-data.frame samdat. The default column name = 'site'.}
-
-\item{site2}{a vector of at least one site number to be found in the 
+\item{grp}{a vector of at least one site number to be found in the 
 data.frame samdat. The default column name = 'site'.}
 
 \item{samdat}{a data.frame of maturity data with site numbers}
+
+\item{groupname}{a name for the group, default='grp'}
 
 \item{sitecol}{column name of the variable for the site numbers. The default
 column name = 'site'}
 }
 \value{
-a list of the site properties, the distance between the two sites, 
-    and a summary of the logistic regression
+a list of the sites, the block(s), n, propI and propM
 }
 \description{
 groupprops extracts the main properties of two vectors of site
@@ -29,11 +27,10 @@ groupprops extracts the main properties of two vectors of site
 }
 \examples{
 print("wait on internal data sets")
-# site1=as.character(c(780,783)); samdat=rdat; sitecol="site"
-# site2=as.character(c(780,783)); 
+# grp=c(780,783); samdat=samw; sitecol="site"; groupname="blk13"
 }
 \seealso{
 {
-   \link{getloc}, \link{siteprops}
+   \link{getloc}, \link{findgroups}, \link{fitgroups}
 }
 }
