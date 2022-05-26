@@ -28,12 +28,12 @@
 #' @examples
 #' dev.new(height=6.0,width=7.5,noRStudioGD = TRUE)
 #' plotaus()
-#' Long <- c(140,141,142,143)
-#' Lat <- c(-41.1,-41.1,-41.1,-41.1)
-#' indata <- cbind(Long,Lat)
+#' long <- c(140,141,142,143)
+#' lat <- c(-41.1,-41.1,-41.1,-41.1)
+#' indata <- cbind(long,lat)
 #' addpoints(indata,incex=1.5)
 addpoints <- function(indat,inpch=20,incex=0.2,incol=2,intitle="",jit=F,
-                      wobble=1, refill=T,Long="Long",Lat="Lat",txtout=TRUE,
+                      wobble=1, refill=T,Long="long",Lat="lat",txtout=TRUE,
                       namecatch="catch_kg") {
    if (length(grep("catch_kg",colnames(indat))) > 0)
       if (txtout)

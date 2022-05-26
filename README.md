@@ -29,6 +29,8 @@ the objects output by, say, *fitIL*, you can use, for example,
 Some details of the package can be found using
 *packageDescription(“biology”)*.
 
+-   26/05/2022 0.0.0.500 Many changes, still under development.
+
 -   02/05/2022 Still needs a vignette and an internal data set, but can
     now be used to conduct an analysis of heterogeniety of maturity in a
     maturity data.set. It can group and separate sites in a

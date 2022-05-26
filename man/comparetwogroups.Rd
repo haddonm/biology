@@ -10,7 +10,7 @@ comparetwogroups(
   samdat,
   sitecol = "site",
   length = "length",
-  mat10 = "mature",
+  mature = "mature",
   sigdiff = 0.05
 )
 }
@@ -28,7 +28,7 @@ column name = 'site'}
 
 \item{length}{column name in samdat for the length variable}
 
-\item{mat10}{column name for the maturity variable in samdat mature=1,
+\item{mature}{column name for the maturity variable in samdat mature=1,
 immature = 0}
 
 \item{sigdiff}{what probability level constistutes a significant difference.
@@ -45,9 +45,10 @@ comparetwogroups using logistic regressions to compare whether
     combined, or not.
 }
 \examples{
+args(comparetwogroups)   
 print("wait on internal data sets")
-# grp1=g1;grp2=g2; sitecol="site";samdat=samb;
-# length="length";mat10="mature"; sigdiff=0.05
+# grp1=sitenames[1];grp2=sitenames[2]; sitecol="siteseas";samdat=sam;
+# length="length";mature="mature"; sigdiff=0.05
 }
 \seealso{
 {

@@ -21,6 +21,7 @@ siteprops extracts the main properties of a vector of site
     subblock, date, and propM (proportion mature).
 }
 \examples{
+args(siteprops)
 print("wait on internal data sets")
 # sits=bsites; samdat=samb
 }

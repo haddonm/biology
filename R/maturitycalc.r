@@ -20,6 +20,7 @@
 #' @export
 #'
 #' @examples
+#' args(analysegroups)  #  ?analysegroups
 #' print("wait on internal datasets")
 #' # blk=13; samdat=samw; sitecol="site"
 analysegroups <- function(blk,samdat,sitecol="site") {
@@ -65,9 +66,8 @@ analysegroups <- function(blk,samdat,sitecol="site") {
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' args(binglm)   #   ?binglm
 #'  # wait on a data set being included into the package
-#' }
 binglm <- function(x,digits=6,console=TRUE) { # x=smodel; digits=6;console=TRUE
   out <- summary(x)
   pars <- coef(out)[,"Estimate"]
@@ -76,11 +76,11 @@ binglm <- function(x,digits=6,console=TRUE) { # x=smodel; digits=6;console=TRUE
   columns <- c("a","b","L50","IQ")
   rows <- names(pars[1:nmod])
   models <- matrix(0,nrow=nmod,ncol=4,dimnames=list(rows,columns))
-  models[1,] <- c(pars[1],pars[npar],-pars[1]/pars[npar],2*log(3)/pars[npar])
+  models[1,] <- c(pars[1],pars[2],-pars[1]/pars[2],2*log(3)/pars[2])
   if (nmod > 1) {
     for (i in 2:nmod) {
-      par1 <- pars[1] + pars[i]
-      models[i,] <- c(par1,pars[npar],-par1/pars[npar],2*log(3)/pars[npar]) 
+      par1 <- pars[1] + pars[1+i]
+      models[i,] <- c(par1,pars[2],-par1/pars[2],2*log(3)/pars[2]) 
     }
   }
   if (console) {  
@@ -93,6 +93,120 @@ binglm <- function(x,digits=6,console=TRUE) { # x=smodel; digits=6;console=TRUE
   }
   return(invisible(list(out=out,param=models)))
 } #end of binglm
+
+#' @title bootmature generates bootstrap 95p CI for a maturity logistic curve  
+#' 
+#' @description bootmature takes the data used when fitting a maturity logistic
+#'     curve, conducts 1000 bootstrap samples and refits the model to obtain 
+#'     the parameters and predicted probabilities of maturity.
+#'
+#' @param samdat the maturity dataset with a minimum of length and maturity
+#'     identified by the arguments 'lens' and 'mature'.
+#' @param label a character string for a label to the model fit, default=''
+#' @param lens the column name of the length data in the data.frame, default =
+#'     'length'
+#' @param mature the column name of the maturity data 1 = mature, 0 = immature,
+#'     default='mature'
+#' @param nb the number of bootstraps to perform, default=1000
+#' @param lower the smallest size class for inclusion in the predicted plot 
+#'     data, the default = 50
+#' @param upper the largest size class for inclusion in the predicted plot 
+#'     data, the default = 160 
+#'     
+#' @seealso {
+#'   \link{fitmaturity}, \link{sample}
+#' }
+#'
+#' @return a list of bootpar, bootout, and bootCI
+#' @export
+#'
+#' @examples
+#' print("wait on data sets")
+#' # samdat=dat; label="";lens="length";mature="mature";nb=1000;lower=50;upper=160
+bootmature <- function(samdat,label="",lens="length",mature="mature",nb=1000,
+                       lower=50, upper=160) {
+  dat <- samdat[,c(lens,mature)] 
+  nr <- nrow(dat)
+  index <- 1:nr
+  predL <- lower:upper
+  nL <- length(predL)
+  bootout <- matrix(0,nrow=nb,ncol=nL,dimnames=list(1:nb,predL))
+  columns <- c("a","b","L50","IQ")
+  bootpar <- matrix(0,nrow=nb,ncol=4,dimnames=list(1:nb,columns))
+  for (i in 1:nb) {
+    samp <- sample(index,nr,replace=TRUE)
+    boot <- dat[samp,]
+    ans2 <- fitmaturity(boot,length=lens,mature=mature,lower=lower,upper=upper)
+    bootout[i,] <- ans2$plotdat[,"predm"]
+    bootpar[i,] <- ans2$param
+  }
+  bootCI <- apply(bootout,2,quants)
+  return(invisible(list(bootpar=bootpar,bootout=bootout,bootCI=bootCI,label=label)))
+} # end of bootmature
+
+#' @title comparetwo compares two maturity curves fitted to two datasets
+#' 
+#' @description comparetwo takes two datasets selected on a categorical factor
+#'    then fits a maturity curve mature = length + comparison, and compares 
+#'    that with a maturity curve mature = length. This requires the MASS library
+#'    for the version of anaova that permits test='Chisq', which conducts an
+#'    analysis of deviance (see Venables and Ripley, 2nd ed, p288). The function
+#'    returns the expanded model, the combined model, and a maturity model for 
+#'    each of the separate data sets. 
+#'
+#' @param samdat1 the selected maturity data for the first set
+#' @param samdat2 the selected maturity data for the second set
+#' @param mature the name of the data.frame column containing the 1's and 0's
+#'    denoting mature and immature, default = 'mature'
+#' @param length the data.frame column name of the length variable, defualt=
+#'    'length'
+#' @param comparison the data.frame name of the comparison factor, default=
+#'    'season' the only current alternative is 'site'
+#' @param lower the smallest size class for inclusion in the predicted plot 
+#'     data, the default = 50
+#' @param upper the largest size class for inclusion in the predicted plot 
+#'     data, the default = 160
+#'
+#' @return a list of lists containing all models, the anova, and the probabilty  
+#'    the curves are different.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'   dat1 <- selecttwo(samdat=sam,value1=site,value2=c(seas1),
+#'                     field1="site",field2="season")
+#'   dat2 <- selecttwo(samdat=sam,value1=site,value2=c(seas2),#c("Autumn","Winter"),
+#'                     field1="site",field2="season")
+#'   ans <- comparetwo(dat1,dat2)
+#'   str(ans,max.level=1)
+#' }
+comparetwo <- function(samdat1,samdat2,mature="mature",length="length",
+                       comparison="season",lower=50,upper=160) {
+  samdat <- rbind(samdat1,samdat2)
+  samdat[,comparison] <- factor(samdat[,comparison])
+  switch(comparison,
+         "season" = modelS <-glm(mature ~ length + season,  data=samdat, 
+                                 family=binomial(link="logit")),
+         "site" = modelS <-glm(mature ~ length + site,  data=samdat, 
+                               family=binomial(link="logit")),
+         stop("Comparison not included"))
+  propm <- tapply(samdat[,mature],samdat[,length],mean) #mean maturity at L
+  lens <- as.numeric(names(propm)) # lengths in the data
+  out <- binglm(modelS,console=FALSE)
+  param <- out$param
+  predm <- maturity(param[1],param[2],lens)
+  plotdat <- cbind(lens,propm,predm)
+  modelC <- list(out=out,model=modelS,param=param,plotdat=plotdat)
+  
+  model <- glm(mature ~ length, data=samdat, family = binomial(link="logit"))
+  anv <- anova(modelS, model, test = "Chisq")
+  prob <- anv[,"Pr(>Chi)"][2]
+  model <- fitmaturity(samdat,mature=mature,length=length,lower=lower,upper=upper)
+  first <- fitmaturity(samdat1,mature=mature,length=length,lower=lower,upper=upper)
+  second <- fitmaturity(samdat2,mature=mature,length=length,lower=lower,upper=upper)
+  return(invisible(list(model=model,modelC=modelC,anv=anv,prob=prob,
+                        first=first,second=second))) 
+} # end of comparetwo
 
 
 #' @title comparetwogroups compares two groups of sites using logistic regression
@@ -109,7 +223,7 @@ binglm <- function(x,digits=6,console=TRUE) { # x=smodel; digits=6;console=TRUE
 #' @param sitecol column name of the variable for the site numbers. The default
 #'     column name = 'site'
 #' @param length column name in samdat for the length variable
-#' @param mat10 column name for the maturity variable in samdat mature=1,
+#' @param mature column name for the maturity variable in samdat mature=1,
 #'     immature = 0
 #' @param sigdiff what probability level constistutes a significant difference.
 #'     default=0.05
@@ -124,22 +238,23 @@ binglm <- function(x,digits=6,console=TRUE) { # x=smodel; digits=6;console=TRUE
 #' @export
 #'
 #' @examples
+#' args(comparetwogroups)   
 #' print("wait on internal data sets")
-#' # grp1=g1;grp2=g2; sitecol="site";samdat=samb;
-#' # length="length";mat10="mature"; sigdiff=0.05
+#' # grp1=sitenames[1];grp2=sitenames[2]; sitecol="siteseas";samdat=sam;
+#' # length="length";mature="mature"; sigdiff=0.05
 comparetwogroups <- function(grp1,grp2,samdat,sitecol="site",
-                             length="length",mat10="mature",sigdiff=0.05) { 
+                             length="length",mature="mature",sigdiff=0.05) { 
   picks <- which(samdat[,sitecol] %in% c(grp1,grp2))
   sams <- samdat[picks,]
   samsf <- sams
   samsf$sitenum <- NA
-  picks1 <- which(samsf$site %in% grp1)
+  picks1 <- which(samsf[,sitecol] %in% grp1)
   samsf$sitenum[picks1] <- 1
   samsf$sitenum[-picks1] <- 2
   samsf$sitenum <- factor(samsf$sitenum)
-  model1 <- glm(formula = samsf[,mat10] ~ samsf[,length] + samsf$sitenum, 
+  model1 <- glm(formula = samsf[,mature] ~ samsf[,length] + samsf$sitenum, 
                 family = binomial)
-  model2 <- glm(formula = samsf[,mat10] ~ samsf[,length],family = binomial)
+  model2 <- glm(formula = samsf[,mature] ~ samsf[,length],family = binomial)
   anv <- anova(model1, model2, test = "Chisq")
   prob <- anv[,"Pr(>Chi)"][2]
   signif <- FALSE
@@ -170,6 +285,7 @@ comparetwogroups <- function(grp1,grp2,samdat,sitecol="site",
 #' @export
 #'
 #' @examples
+#' args(findgroups)
 #' print("wait on internal data sets")
 #' # sitenums=sitenums;samdat=samb; sitecol="site";console=FALSE
 findgroups <- function(sitenums,samdat,sitecol="site",console=FALSE) {
@@ -209,7 +325,7 @@ findgroups <- function(sitenums,samdat,sitecol="site",console=FALSE) {
 #' @param sitecol column name of the variable for the site numbers. The default
 #'     column name = 'site'
 #' @param length column name in samdat for the length variable
-#' @param mat10 column name for the maturity variable in samdat mature=1,
+#' @param mature column name for the maturity variable in samdat mature=1,
 #'     immature = 0
 #'
 #' @return an invisible list containing the parameters and the fitmaturity 
@@ -217,18 +333,20 @@ findgroups <- function(sitenums,samdat,sitecol="site",console=FALSE) {
 #' @export
 #'
 #' @examples
+#' args(fitgroups)
 #' print("wait on internal data sets")
-#' #  groups=groups1; samdat=samb;length="length";mat10="mature";sitecol="site"
+#' #  groups=group; samdat=samb;length="length";mature="mature";sitecol="site"
 fitgroups <- function(groups,samdat,sitecol="site",length="length",
-                      mat10="mature") {
+                      mature="mature") {
   ng <- length(groups)
   fits <- vector(mode="list",length=ng)
   names(fits) <- 1:ng
   columns <- c("a","b","L50","IQ","n","nsites")
   param <- matrix(0,nrow=ng,ncol=length(columns),dimnames=list(1:ng,columns))
   for (i in 1:ng) { #  i=1
-    ans <- fitmaturity(groups[[i]],samdat=samdat,sitecol=sitecol,
-                       length=length,mat10=mat10)
+    pickg <- which(samdat[,sitecol] %in% groups[[i]])
+    samg <- samdat[pickg,]
+    ans <- fitmaturity(sams=samg,length=length,mature=mature)
     fits[[i]] <- ans
     param[i,] <- c(ans$param,(ans$out$out$df.null + 1),length(groups[[i]]))
   }
@@ -242,35 +360,45 @@ fitgroups <- function(groups,samdat,sitecol="site",length="length",
 #'     It outputs the regression results, the parameters, a, b, Lm50, and IQ, as
 #'     well as the data for plotting as 'lens', 'propm', and 'predm' 
 #'
-#' @param sites a vector of at least one site number to be found in the 
-#'     data.frame samdat. The default column name = 'site'.
-#' @param samdat a data.frame of maturity data containing the required site(s)
-#' @param sitecol column name of the variable for the site numbers. The default
-#'     column name = 'site'
-#' @param length column name in samdat for the length variable
-#' @param mat10 column name for the maturity variable in samdat mature=1,
+#' @param sams a data.frame of maturity data. This requires that any data 
+#'     selection of say sites and/or seasons must be done outside the function. 
+#' @param length column name in sams for the length variable
+#' @param mature column name for the maturity variable in sams mature=1,
 #'     immature = 0
+#' @param lower the smallest size class for inclusion in the predicted plot 
+#'     data, the default = 50
+#' @param upper the largest size class for inclusion in the predicted plot 
+#'     data, the default = 160
 #'
 #' @return an invisible list containing the regression results, the model,
-#'     the parameters, and the plotdata
+#'     the parameters, and the plotdata, which contains both predm and 95 CI.
 #' @export
 #'
 #' @examples
+#' args(fitmaturity)
 #' print("wait on internal data sets")
-#' #  sites=grp; samdat=samb;length="length";mat10="mature";sitecol="site"
-fitmaturity <- function(sites,samdat,sitecol="site",length="length",
-                        mat10="mature") {
-  picks <- which(samdat[,sitecol] %in% sites)
-  sams <- samdat[picks,]
-  model <- glm(formula = sams[,mat10] ~ sams[,length], family = binomial)
-  propm <- tapply(sams[,mat10],sams[,length],mean) #mean maturity at L
+#' # sams=samdat;length="length";mature="mature";lower=50;upper=160
+fitmaturity <- function(sams,length="length",mature="mature",lower=50,upper=160) {
+  model <- glm(mature ~ length, data=sams, family = binomial(link="logit"))
+  propm <- tapply(sams[,mature],sams[,length],mean) #mean maturity at L
   lens <- as.numeric(names(propm)) # lengths in the data
   out <- binglm(model,console=FALSE)
   param <- out$param
-  predm <- maturity(param[1],param[2],lens)
-  plotdat <- cbind(lens,propm,predm)
+  newdat <- data.frame(length=(lower:upper))
+  predm <- predict(model, newdata=newdat, se.fit=TRUE)
+  nplot <- length(predm$fit)
+  propm2 <- rep(NA,nplot)
+  picklens <- which((lens <= upper) & (lens >= lower))
+  pickL <- match(lens[picklens],newdat[,"length"])
+  propm2[pickL] <- propm[picklens]
+  predmat <- exp(predm$fit)/(1+exp(predm$fit))
+  L95 <- exp(predm$fit-1.96*predm$se.fit)/(1+exp(predm$fit-1.96*predm$se.fit))
+  U95 <- exp(predm$fit+1.96*predm$se.fit)/(1+exp(predm$fit+1.96*predm$se.fit))
+  plotdat <- cbind(newdat=newdat,propm=propm2,predm=predmat,se=predm$se.fit,
+                   L95=L95,U95=U95)
   return(invisible(list(out=out,model=model,param=param,plotdat=plotdat)))
 } # end of fitmaturity
+
 
 #' @title getdistances estimates the haversine distance between sites
 #' 
@@ -286,6 +414,7 @@ fitmaturity <- function(sites,samdat,sitecol="site",length="length",
 #' @export
 #'
 #' @examples
+#' args(getdistances)
 #' print("wait on internal data sets")
 getdistances <- function(siteprop) {
   nsites <- nrow(siteprop)
@@ -315,6 +444,7 @@ getdistances <- function(siteprop) {
 #' @export
 #'
 #' @examples
+#' args(getloc)
 #' print("wait on internal data sets")
 #' # sits=bsites; samdat=samb; orderby="none"
 getloc <- function(sits,samdat,orderby="none") { # 
@@ -336,7 +466,7 @@ getloc <- function(sits,samdat,orderby="none") { #
 
 #' @title getsiteparams get all the individual site parameters in a data.frame
 #' 
-#' @description getsiteparams estimates the site parmaeters and all the model
+#' @description getsiteparams estimates the site parameters and all the model
 #'     fits for all sites within a data.frame. This sets up the system ready
 #'     for site comparisons 
 #'
@@ -344,16 +474,22 @@ getloc <- function(sits,samdat,orderby="none") { #
 #' @param sitecol column name of the variable for the site numbers. The default
 #'     column name = 'site'
 #' @param length column name in samdat for the length variable
-#' @param mat10 column name for the maturity variable in samdat mature=1,
+#' @param mature column name for the maturity variable in samdat mature=1,
 #'     immature = 0
+#' @param lower the smallest size class for inclusion in the predicted plot 
+#'     data, the default = 50
+#' @param upper the largest size class for inclusion in the predicted plot 
+#'     data, the default = 160
 #'
 #' @return a list containing a matrix of the site parameters and a list of all
 #'     the model fits used (called allfit)
 #' @export
 #'
 #' @examples
-#' print("wait on intenral data sets")
-getsiteparams <- function(samdat,sitecol="site",length="length",mat10="mature") {
+#' args(getsiteparams)
+#' print("wait on internal data sets")
+getsiteparams <- function(samdat,sitecol="site",length="length",mature="mature",
+                          lower=50,upper=160) {
   sits <- sort(unique(samdat[,sitecol]))
   nsits <- length(sits)
   allfit <- vector(mode="list",length=nsits)
@@ -361,8 +497,9 @@ getsiteparams <- function(samdat,sitecol="site",length="length",mat10="mature") 
   columns <- c("a","b","Lm50","IQm","n")
   sitepar <- matrix(0,nrow=nsits,ncol=length(columns),dimnames=list(sits,columns))
   for (i in 1:nsits) { # i = 1
-    model <- fitmaturity(sits[i],samdat=samdat,sitecol=sitecol,length=length,
-                         mat10=mat10)
+    picks <- which(samdat[,sitecol] == sits[i])
+    model <- fitmaturity(sams=samdat[picks,],length=length,mature=mature,
+                         lower=lower,upper=upper)
     allfit[[i]] <- model
     sitepar[i,] <- c(model$param,length(model$out$out$deviance.resid))
   }
@@ -390,6 +527,7 @@ getsiteparams <- function(samdat,sitecol="site",length="length",mat10="mature") 
 #' @export
 #'
 #' @examples
+#' args(groupprops)
 #' print("wait on internal data sets")
 #' # grp=c(780,783); samdat=samw; sitecol="site"; groupname="blk13"
 groupprops <- function(grp,samdat,groupname="grp",sitecol="site") {
@@ -413,6 +551,30 @@ groupprops <- function(grp,samdat,groupname="grp",sitecol="site") {
   return(ans)
 } # end of groupprops
 
+#' @title labelmake combines the contents of a character vector to make a label
+#' 
+#' @description labelmake is a utility function that takes a vector of values, 
+#'     either numeric or text, and combines them with a selected separator. Any
+#'     numeric values also have the option of being rounded to a given precision
+#'
+#' @param vect a vector of either all text or all numbers, mixtures not allowed
+#' @param sep what separator should be used, default = '_'
+#' @param digits if a numeric vector is input how many decimal places to be used?
+#'     default = 3
+#'
+#' @return a character string of the contents of vect combined
+#' @export
+#'
+#' @examples
+#' x <- c("one","two","three")
+#' labelmake(x)
+#' x <- c(1,2,3,pi)
+#' labelmake(x,digits=5)
+labelmake <- function(vect,sep="_",digits=3) {
+  if (is.numeric(vect)) vect <- round(vect,digits)
+  label <- paste(vect,sep=sep,collapse=sep)
+  return(label)
+} # end of labelmake
 
 #' @title maturity Logistic maturity curve
 #'
@@ -428,16 +590,68 @@ groupprops <- function(grp,samdat,groupname="grp",sitecol="site") {
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' a <- -14.383
 #' b <- 0.146017
 #' lens <- seq(2,210,2)
 #' Maturity <- maturity(a,b,lens)
-#' }
 maturity <- function(ina,inb,lens) {
   ans <- exp(ina+inb*lens)/(1+exp(ina+inb*lens))
   return(ans)
 } # end of maturity
+
+#' @title plotcomparison generates a plot from the output of comparetwo
+#' 
+#' @description plotcomparison uses the output of the function 'comparetwo' to
+#'    generate a plot of the maturity curves fitted to the original data from 
+#'    the two datasets, plus, if there is no significant difference, the 
+#'    combined maturity curve, all with 95 percent CI.
+#'
+#' @param ans the output from the function 'comparetwo'
+#' @param name1 a character strong as the name of the first dataset
+#' @param name2 a character strong as the name of the second dataset
+#' @param P the probabiolity lelve that is taken as representing a significant
+#'    difference between two maturity curves, default = 0.01
+#'
+#' @return nothing but it does plot a graph
+#' @export
+#'
+#' @examples
+#' print("wait on internal data sets")
+plotcomparison <- function(ans,name1, name2,P=0.01) {
+  first <- ans$first
+  plotdat1 <- first$plotdat
+  second <- ans$second
+  plotdat2 <- second$plotdat
+  model <- ans$model
+  plotdat <- model$plotdat
+  lens <- plotdat2[,"length"]
+  parset(cex=1.0)
+  plot(lens,plotdat1[,"propm"], type="p",pch=16,cex=1.0, ylim=c(0, 1),col=1, 
+       ylab="Proportion Mature", xlab="length",panel.first=grid(),
+       xlim=c(50,160))
+  lines(lens, plotdat1$predm, col="black",lwd=2)
+  lines(lens, plotdat1$L95, lty=2)
+  lines(lens, plotdat1$U95, lty=2)
+  
+  points(lens,plotdat2[,"propm"],pch=1,cex=1.5,col=4)
+  lines(lens, plotdat2$predm, col=4,lwd=2)
+  lines(lens, plotdat2$L95, lty=2,col=4)
+  lines(lens, plotdat2$U95, lty=2,col=4)
+  label <- c(name1,name2)
+  linecol <- c(1,4)
+  if (ans$prob > P) {
+    lines(lens, plotdat$predm, col=2,lwd=2)
+    lines(lens, plotdat$L95, lty=2,col=2)
+    lines(lens, plotdat$U95, lty=2,col=2)
+    label <- c(name1,name2,"combined")
+    linecol <- c(1,4,2)
+  }
+  abline(h=0.5,lwd=1,col="darkgrey")
+  legend("topleft",legend=label,col=linecol,lwd=3,bty="n")
+  plab <- paste0("pdiff = ",round(ans$prob,4),"    ")
+  mtext(plab,side=1,outer=FALSE,line=-1.1,adj=1)
+} # end of plotcomparison
+
 
 #' @title plotgroups fits a maturity ~ length logistic regression to groups
 #' 
@@ -452,7 +666,7 @@ maturity <- function(ina,inb,lens) {
 #' @param sitecol column name of the variable for the site numbers. The default
 #'     column name = 'site'
 #' @param length column name in samdat for the length variable
-#' @param mat10 column name for the maturity variable in samdat mature=1,
+#' @param mature column name for the maturity variable in samdat mature=1,
 #'     immature = 0
 #' @param margin what margin should be used in the plot? 
 #'     default=c(0.4,0.4,0.05,0.05)
@@ -462,13 +676,14 @@ maturity <- function(ina,inb,lens) {
 #' @export
 #'
 #' @examples
+#' args(plotgroups)
 #' print("wait on internal data sets")
-#' #  groups=group2; samdat=samb;length="length";mat10="mature";sitecol="site"
+#' #  groups=group; samdat=samb;length="length";mature="mature";sitecol="site"
 plotgroups <- function(groups,samdat,xmin=0,xmax=0,sitecol="site",
-                       length="length",mat10="mature",
+                       length="length",mature="mature",
                        margin=c(0.4,0.4,0.05,0.05)) { # x = outgs
   outfit <- suppressWarnings(fitgroups(groups,samdat,sitecol=sitecol,
-                                       length=length,mat10=mat10))
+                                       length=length,mature=mature))
   fits <- outfit$fits
   nfits <- length(fits)
   parset(plots=pickbound(nfits),byrow=FALSE,margin=margin)
@@ -490,6 +705,7 @@ plotgroups <- function(groups,samdat,xmin=0,xmax=0,sitecol="site",
 #' @param col colour of the predicted maturity curve, default=2 = red
 #' @param xmin a generic x-axis minimum?, if 0 use local, default=0
 #' @param xmax a generic x-axis maximum?, if 0 use local, default=0
+#' @param CI should the 95 perc CI be plotted? default=FALSE
 #' @param setpar should parset be called, useful when only a single plot is
 #'     being made. default=FALSE
 #' 
@@ -501,8 +717,10 @@ plotgroups <- function(groups,samdat,xmin=0,xmax=0,sitecol="site",
 #' @export
 #'
 #' @examples
+#' args(plotmaturity)
 #' print("wait on data sets")
-plotmaturity <- function(model,label="",col=2,xmin=0,xmax=0,setpar=FALSE) {
+plotmaturity <- function(model,label="",col=2,xmin=0,xmax=0,CI=FALSE,
+                         setpar=FALSE) {
   dat <- model$plotdat
   xlabel <- ""
   if (setpar) {
@@ -510,15 +728,19 @@ plotmaturity <- function(model,label="",col=2,xmin=0,xmax=0,setpar=FALSE) {
     xlabel <- "Shell Length mm"
   }
   if ((xmin == 0) & (xmax == 0)) {
-    xmin <- getmin(dat[,"lens"])
-    xmax <- getmax(dat[,"lens"])
+    xmin <- getmin(dat[,"length"])
+    xmax <- getmax(dat[,"length"])
   } 
-  plot(dat[,"lens"],dat[,"propm"],type="p",cex=1.0,pch=16,xlim=c(xmin,xmax),
+  plot(dat[,"length"],dat[,"propm"],type="p",cex=1.0,pch=16,xlim=c(xmin,xmax),
        xlab=xlabel,ylab=label,yaxs="r",panel.first = grid())
-  lines(dat[,"lens"],dat[,"predm"],lwd=2,col=col)
+  lines(dat[,"length"],dat[,"predm"],lwd=2,col=col)
   abline(h=c(0,0.5,1),lwd=1,col="grey")
   Lm50 <- model$param[1,"L50"]
   abline(v=Lm50,lwd=1,col=3)
+  if (CI) {
+    lines(dat[,"length"],dat[,"U95"],lwd=1,col=1,lty=2)
+    lines(dat[,"length"],dat[,"L95"],lwd=1,col=1,lty=2)
+  }
   mtext(round(Lm50,3),side=3,line=-1.2,cex=1.0,adj=0)
 } # end of plotmaturity
 
@@ -537,7 +759,7 @@ plotmaturity <- function(model,label="",col=2,xmin=0,xmax=0,setpar=FALSE) {
 #' @param sitecol column name of the variable for the site numbers. The default
 #'     column name = 'site'
 #' @param length column name in samdat for the length variable
-#' @param mat10 column name for the maturity variable in samdat mature=1,
+#' @param mature column name for the maturity variable in samdat mature=1,
 #'     immature = 0
 #'
 #' @return an invisible list containing the parameters and the fitmaturity 
@@ -545,25 +767,29 @@ plotmaturity <- function(model,label="",col=2,xmin=0,xmax=0,setpar=FALSE) {
 #' @export
 #'
 #' @examples
+#' args(plotsinglegroup)
 #' print("wait on internal data sets")
-#' #  groups=groups1; samdat=samb;length="length";mat10="mature";sitecol="site"
+#' #  groups=group; samdat=samb;length="length";mature="mature";sitecol="site"
 plotsinglegroup <- function(groups,samdat,xmin=0,xmax=0,margin=c(0.4,0.4,0.05,0.05),
-                            sitecol="site",length="length",mat10="mature") { 
-  outfit <- fitgroups(groups,samdat,sitecol=sitecol,length=length,mat10=mat10)
-  fits <- outfit$fits
-  nfits <- length(fits)
-  combined <- fitmaturity(sites=groups,samdat=samdat,sitecol=sitecol,
-                          length=length,mat10=mat10) 
-  label <- makelabel("",groups)
-  parset(margin=margin)
-  plotmaturity(combined,label=label,xmin=xmin,xmax=xmax)
-  colour <- 3:(nfits+2)
-  for (i in 1:nfits) { #  i = 1
-    plotdat <- fits[[i]]$plotdat
-    lines(plotdat[,"lens"],plotdat[,"predm"],lwd=2,col=colour[i])
-  }
-  legend("bottomright",c(groups,label),col=c(colour,2),lwd=3,bty="n",cex=1.25)
-  return(invisible(list(outfit=outfit,combined=combined)))
+                            sitecol="site",length="length",mature="mature") { 
+  # outfit <- fitgroups(groups,samdat,sitecol=sitecol,length=length,mature=mature)
+  # fits <- outfit$fits
+  # nfits <- length(fits)
+  # for (i in 1:nfits) {
+  #   
+  # }
+  # combined <- fitmaturity(sites=groups,samdat=samdat,sitecol=sitecol,
+  #                         length=length,mature=mature)
+  # label <- makelabel("",groups)
+  # parset(margin=margin)
+  # plotmaturity(combined,label=label,xmin=xmin,xmax=xmax)
+  # colour <- 3:(nfits+2)
+  # for (i in 1:nfits) { #  i = 1
+  #   plotdat <- fits[[i]]$plotdat
+  #   lines(plotdat[,"lens"],plotdat[,"predm"],lwd=2,col=colour[i])
+  # }
+  # legend("bottomright",c(groups,label),col=c(colour,2),lwd=3,bty="n",cex=1.25)
+  # return(invisible(list(outfit=outfit,combined=combined)))
 } # end of plotsinglegroup
 
 #' @title plottwosites fits and plots two sites, including the combined by default
@@ -572,49 +798,45 @@ plotsinglegroup <- function(groups,samdat,xmin=0,xmax=0,margin=c(0.4,0.4,0.05,0.
 #'     the combined data for both sites. It then plots them together on the same 
 #'     graph. The out is, invisibly, a list of all results.
 #'
-#' @param grp1 a vector of at least one site number to be found in the 
-#'     data.frame samdat. The default column name = 'site'.
-#' @param grp2 a vector of at least one site number to be found in the 
-#'     data.frame samdat. The default column name = 'site'.  
-#' @param samdat a data.frame containing the maturity data that includes the two 
-#'     sites
+#' @param sam1 a data.frame containing the maturity data for group 1
+#' @param sam2 a data.frame containing the maturity data for group 2
 #' @param length column name of the length variable within the data.frame,
 #'     default='length'
-#' @param mat10 column name of the maturity variable containing mature=1, and
+#' @param mature column name of the maturity variable containing mature=1, and
 #'     immature = 0 for all length observations. default='mature'
-#' @param sitecol column name for the site number, default='combsite', ready for 
-#'     when sites are combined
+#' @param sitecol column name of the variable for the site numbers. The default
+#'     column name = 'site'
 #'
-#' @return invisibly, a list containing the model fits for each site and the
-#'     combined sites if combine = TRUE
+#' @return invisibly, a list containing the model fits for each group of sites, 
+#'     and the model for all sites combined
 #' @export
 #'
 #' @examples
+#' args(plottwogroups)
 #' print("wait on internal data sets")
-#' # grp1=c(43,874,2);grp2=c(128); samdat=samW;length="length";mat10="mature";sitecol="site"
-plottwogroups <- function(grp1,grp2,samdat,length="length",mat10="mature",
-                         sitecol="site") {  
-  picks <- which(samdat[,sitecol] %in% c(grp1,grp2))
-  sams <- samdat[picks,]
+#' # grp1=c(43,874,2);grp2=c(128); samdat=samW;length="length";mature="mature";sitecol="site"
+plottwogroups <- function(sam1,sam2,length="length",mature="mature",
+                          sitecol="site") {  
+  sams <- rbind(sam1,sam2)
   ans <- vector("list",length=3)
-  ans[[1]] <- fitmaturity(grp1,sams,length=length,mat10=mat10)
-  ans[[2]] <- fitmaturity(grp2,sams,length=length,mat10=mat10)
-  ans[[3]] <- fitmaturity(c(grp1,grp2),sams,length=length,mat10=mat10)
-  xmin <- getmin(c(ans[[1]]$plotdat[,"lens"],ans[[2]]$plotdat[,"lens"]))
-  xmax <- getmax(c(ans[[1]]$plotdat[,"lens"],ans[[2]]$plotdat[,"lens"]))
+  ans[[1]] <- fitmaturity(sam1,length=length,mature=mature)
+  ans[[2]] <- fitmaturity(sam2,length=length,mature=mature)
+  ans[[3]] <- fitmaturity(sams,length=length,mature=mature)
+  xmin <- getmin(c(ans[[1]]$plotdat[,"length"],ans[[2]]$plotdat[,"length"]))
+  xmax <- getmax(c(ans[[1]]$plotdat[,"length"],ans[[2]]$plotdat[,"length"]))
   parset()
-  plot(ans[[1]]$plotdat[,"lens"],ans[[1]]$plotdat[,"propm"],type="p",pch=16,
+  plot(ans[[1]]$plotdat[,"length"],ans[[1]]$plotdat[,"propm"],type="p",pch=16,
        cex=1.0,xlim=c(xmin,xmax),xlab="shell length",yaxs="r",
        ylab=paste0("Proportion Mature"),panel.first=grid())
-  points(ans[[2]]$plotdat[,"lens"],ans[[2]]$plotdat[,"propm"],pch=1,
+  points(ans[[2]]$plotdat[,"length"],ans[[2]]$plotdat[,"propm"],pch=1,
          col="blue",cex=1.75)
-  lines(ans[[1]]$plotdat[,"lens"],ans[[1]]$plotdat[,"predm"],lwd=2,col=1)
-  lines(ans[[2]]$plotdat[,"lens"],ans[[2]]$plotdat[,"predm"],lwd=2,col="blue")
-  points(ans[[3]]$plotdat[,"lens"],ans[[3]]$plotdat[,"propm"],pch=1,col=2,
+  lines(ans[[1]]$plotdat[,"length"],ans[[1]]$plotdat[,"predm"],lwd=2,col=1)
+  lines(ans[[2]]$plotdat[,"length"],ans[[2]]$plotdat[,"predm"],lwd=2,col="blue")
+  points(ans[[3]]$plotdat[,"length"],ans[[3]]$plotdat[,"propm"],pch=1,col=2,
          cex=1.5)
-  lines(ans[[3]]$plotdat[,"lens"],ans[[3]]$plotdat[,"predm"],lwd=2,col=2)
-  lab1 <- makelabel("",grp1)
-  lab2 <- makelabel("",grp2)
+  lines(ans[[3]]$plotdat[,"length"],ans[[3]]$plotdat[,"predm"],lwd=2,col=2)
+  lab1 <- makelabel("",sort(unique(sam1[,sitecol])))
+  lab2 <- makelabel("",sort(unique(sam2[,sitecol])))
   legend("topleft",c(lab1,lab2,"combined"),col=c("black","blue",2),
          lwd=3,bty="n",cex=1.2)
   param <- sapply(ans,"[[","param")
@@ -641,6 +863,7 @@ plottwogroups <- function(grp1,grp2,samdat,length="length",mat10="mature",
 #' @export
 #'
 #' @examples
+#' args(printgroup)
 #' agroup <- list("1"=c(1,2,3),"2"=c(4,5),"3"=c(6,7,8,9))
 #' printgroup(agroup)
 printgroup <- function(group) {
@@ -654,6 +877,36 @@ printgroup <- function(group) {
   }
 } # end of printgroup
 
+#' @title selecttwo selects data from a data.frame on two factors
+#' 
+#' @description selecttwo selects data from a data.frame on two factors/fields
+#'     where the values for each field can be a vector of values. This can be 
+#'     useful when there ar emultiple levels within multiple fields/factors and
+#'     how best to combine them is unknown.
+#'
+#' @param samdat the data.frame being selected from.
+#' @param value1 a vector or values for the first field, possibly just one
+#' @param value2 a vector or values for the second field, possibly just one
+#' @param field1 the column name in the data.frame from which to select the
+#'     value1
+#' @param field2 the column name in the data.frame from which to select the
+#'     value2
+#'
+#' @return a data.frame subsetted from the input data.rame
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'   site1 <- "George"
+#'   seas1 <- c("Spring","Summer")
+#'   dat1 <- selecttwo(samdat=sam,value1=site1,value2=c(seas1),
+#'                     field1="site",field2="season")
+#' }
+selecttwo <- function(samdat,value1,value2,field1="site",field2="season") {
+  pickrow <- which((samdat[,field1] %in% value1) & (samdat[,field2] %in% value2))
+  outdat <- samdat[pickrow,]
+  return(outdat)                 
+} # end of selecttwo
 
 #' @title siteprops tabulates the properties of each site number in a data.frame
 #' 
@@ -673,6 +926,7 @@ printgroup <- function(group) {
 #' @export
 #'
 #' @examples
+#' args(siteprops)
 #' print("wait on internal data sets")
 #' # sits=bsites; samdat=samb
 siteprops <- function(samdat,sitecol="site") {
@@ -706,7 +960,7 @@ siteprops <- function(samdat,sitecol="site") {
 #' @param sitecol column name of the variable for the site numbers. The default
 #'     column name = 'site'
 #' @param length column name in samdat for the length variable
-#' @param mat10 column name for the maturity variable in samdat mature=1,
+#' @param mature column name for the maturity variable in samdat mature=1,
 #'     immature = 0
 #' 
 #' @seealso {
@@ -717,14 +971,15 @@ siteprops <- function(samdat,sitecol="site") {
 #' @export
 #'
 #' @examples
+#' args(testgroup)
 #' print("wait on internal data sets")
 #' # site1=grp;site2=grp2; sitecol="site";samdat=samb;length="length";mature="mature"
-testgroup <- function(grp,samdat,sitecol="site",length="length",mat10="mature") { 
+testgroup <- function(grp,samdat,sitecol="site",length="length",mature="mature") { 
   picks <- which(samdat[,sitecol] %in% grp)
   sams <- samdat[picks,]
   samsf <- sams
   samsf[,sitecol] <- factor(samsf[,sitecol])
-  model <- glm(formula = samsf[,mat10] ~ samsf[,length] + samsf[,sitecol], 
+  model <- glm(formula = samsf[,mature] ~ samsf[,length] + samsf[,sitecol], 
                family = binomial)
   summ <- summary(model)
   return(summ=summ)

@@ -1,7 +1,7 @@
 Package: biology
 Title: Aids Fitting curves to growth and maturity Data
-Version: 0.0.0.400
-Date: 2022-05-02
+Version: 0.0.0.500
+Date: 2022-05-26
 Authors@R: person("Malcolm", "Haddon", role = c("aut", "cre"), 
                   email = "malcolm.haddon@gmail.com")
 Description: Aids in fitting growth curves to invertebrate tagging data, 

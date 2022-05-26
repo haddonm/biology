@@ -20,5 +20,6 @@ getdistance uses theoutput from siteprops to estimate the
     these values.
 }
 \examples{
+args(getdistances)
 print("wait on internal data sets")
 }

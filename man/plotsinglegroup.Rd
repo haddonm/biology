@@ -12,7 +12,7 @@ plotsinglegroup(
   margin = c(0.4, 0.4, 0.05, 0.05),
   sitecol = "site",
   length = "length",
-  mat10 = "mature"
+  mature = "mature"
 )
 }
 \arguments{
@@ -32,7 +32,7 @@ column name = 'site'}
 
 \item{length}{column name in samdat for the length variable}
 
-\item{mat10}{column name for the maturity variable in samdat mature=1,
+\item{mature}{column name for the maturity variable in samdat mature=1,
 immature = 0}
 }
 \value{
@@ -45,6 +45,7 @@ plotsinglegroup after using findgroups one can use plotgroup to
     fit.
 }
 \examples{
+args(plotsinglegroup)
 print("wait on internal data sets")
-#  groups=groups1; samdat=samb;length="length";mat10="mature";sitecol="site"
+#  groups=group; samdat=samb;length="length";mature="mature";sitecol="site"
 }

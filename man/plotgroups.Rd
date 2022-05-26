@@ -11,7 +11,7 @@ plotgroups(
   xmax = 0,
   sitecol = "site",
   length = "length",
-  mat10 = "mature",
+  mature = "mature",
   margin = c(0.4, 0.4, 0.05, 0.05)
 )
 }
@@ -29,7 +29,7 @@ column name = 'site'}
 
 \item{length}{column name in samdat for the length variable}
 
-\item{mat10}{column name for the maturity variable in samdat mature=1,
+\item{mature}{column name for the maturity variable in samdat mature=1,
 immature = 0}
 
 \item{margin}{what margin should be used in the plot? 
@@ -45,6 +45,7 @@ plotgroups after using findgroups one can use plotgroups to
     those results invisibly.
 }
 \examples{
+args(plotgroups)
 print("wait on internal data sets")
-#  groups=group2; samdat=samb;length="length";mat10="mature";sitecol="site"
+#  groups=group; samdat=samb;length="length";mature="mature";sitecol="site"
 }

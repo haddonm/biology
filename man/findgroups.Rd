@@ -29,6 +29,7 @@ findgroups conducts a sequential comparison of logistic maturity
     is used shoulkd be reversed and the findgroups applied again.
 }
 \examples{
+args(findgroups)
 print("wait on internal data sets")
 # sitenums=sitenums;samdat=samb; sitecol="site";console=FALSE
 }

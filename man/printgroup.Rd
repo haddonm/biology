@@ -19,6 +19,7 @@ printgroup is a simple function to print a group of sites list
     defining a new S3 method so one doesn't have to define a new class.
 }
 \examples{
+args(printgroup)
 agroup <- list("1"=c(1,2,3),"2"=c(4,5),"3"=c(6,7,8,9))
 printgroup(agroup)
 }

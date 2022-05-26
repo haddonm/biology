@@ -9,7 +9,7 @@ fitgroups(
   samdat,
   sitecol = "site",
   length = "length",
-  mat10 = "mature"
+  mature = "mature"
 )
 }
 \arguments{
@@ -22,7 +22,7 @@ column name = 'site'}
 
 \item{length}{column name in samdat for the length variable}
 
-\item{mat10}{column name for the maturity variable in samdat mature=1,
+\item{mature}{column name for the maturity variable in samdat mature=1,
 immature = 0}
 }
 \value{
@@ -34,6 +34,7 @@ fitgroups after using findgroups one can use fitgroups to
     fit maturity curves to each group found
 }
 \examples{
+args(fitgroups)
 print("wait on internal data sets")
-#  groups=groups1; samdat=samb;length="length";mat10="mature";sitecol="site"
+#  groups=group; samdat=samb;length="length";mature="mature";sitecol="site"
 }

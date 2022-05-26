@@ -4,7 +4,14 @@
 \alias{getsiteparams}
 \title{getsiteparams get all the individual site parameters in a data.frame}
 \usage{
-getsiteparams(samdat, sitecol = "site", length = "length", mat10 = "mature")
+getsiteparams(
+  samdat,
+  sitecol = "site",
+  length = "length",
+  mature = "mature",
+  lower = 50,
+  upper = 160
+)
 }
 \arguments{
 \item{samdat}{a data.frame of maturity data containing sites}
@@ -14,18 +21,25 @@ column name = 'site'}
 
 \item{length}{column name in samdat for the length variable}
 
-\item{mat10}{column name for the maturity variable in samdat mature=1,
+\item{mature}{column name for the maturity variable in samdat mature=1,
 immature = 0}
+
+\item{lower}{the smallest size class for inclusion in the predicted plot 
+data, the default = 50}
+
+\item{upper}{the largest size class for inclusion in the predicted plot 
+data, the default = 160}
 }
 \value{
 a list containing a matrix of the site parameters and a list of all
     the model fits used (called allfit)
 }
 \description{
-getsiteparams estimates the site parmaeters and all the model
+getsiteparams estimates the site parameters and all the model
     fits for all sites within a data.frame. This sets up the system ready
     for site comparisons
 }
 \examples{
-print("wait on intenral data sets")
+args(getsiteparams)
+print("wait on internal data sets")
 }

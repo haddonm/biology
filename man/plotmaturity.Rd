@@ -4,7 +4,15 @@
 \alias{plotmaturity}
 \title{plotmaturity generates a plot of fitted maturity data.}
 \usage{
-plotmaturity(model, label = "", col = 2, xmin = 0, xmax = 0, setpar = FALSE)
+plotmaturity(
+  model,
+  label = "",
+  col = 2,
+  xmin = 0,
+  xmax = 0,
+  CI = FALSE,
+  setpar = FALSE
+)
 }
 \arguments{
 \item{model}{the output from the fitmaturity function}
@@ -18,6 +26,8 @@ combination of site numbers making up a group}
 
 \item{xmax}{a generic x-axis maximum?, if 0 use local, default=0}
 
+\item{CI}{should the 95 perc CI be plotted? default=FALSE}
+
 \item{setpar}{should parset be called, useful when only a single plot is
 being made. default=FALSE}
 }
@@ -29,6 +39,7 @@ plotmaturity generates a plot of the maturity curve and data
    when provided with the model output from fitmaturity
 }
 \examples{
+args(plotmaturity)
 print("wait on data sets")
 }
 \seealso{

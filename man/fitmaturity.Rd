@@ -5,30 +5,31 @@
 \title{fitmaturity fits a maturity ~ length logistic regression to maturity}
 \usage{
 fitmaturity(
-  sites,
-  samdat,
-  sitecol = "site",
+  sams,
   length = "length",
-  mat10 = "mature"
+  mature = "mature",
+  lower = 50,
+  upper = 160
 )
 }
 \arguments{
-\item{sites}{a vector of at least one site number to be found in the 
-data.frame samdat. The default column name = 'site'.}
+\item{sams}{a data.frame of maturity data. This requires that any data 
+selection of say sites and/or seasons must be done outside the function.}
 
-\item{samdat}{a data.frame of maturity data containing the required site(s)}
+\item{length}{column name in sams for the length variable}
 
-\item{sitecol}{column name of the variable for the site numbers. The default
-column name = 'site'}
-
-\item{length}{column name in samdat for the length variable}
-
-\item{mat10}{column name for the maturity variable in samdat mature=1,
+\item{mature}{column name for the maturity variable in sams mature=1,
 immature = 0}
+
+\item{lower}{the smallest size class for inclusion in the predicted plot 
+data, the default = 50}
+
+\item{upper}{the largest size class for inclusion in the predicted plot 
+data, the default = 160}
 }
 \value{
 an invisible list containing the regression results, the model,
-    the parameters, and the plotdata
+    the parameters, and the plotdata, which contains both predm and 95 CI.
 }
 \description{
 fitmaturity uses data of the form maturity = 1 immaturity = 0,
@@ -37,6 +38,7 @@ fitmaturity uses data of the form maturity = 1 immaturity = 0,
     well as the data for plotting as 'lens', 'propm', and 'predm'
 }
 \examples{
+args(fitmaturity)
 print("wait on internal data sets")
-#  sites=grp; samdat=samb;length="length";mat10="mature";sitecol="site"
+# sams=samdat;length="length";mature="mature";lower=50;upper=160
 }

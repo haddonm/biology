@@ -24,10 +24,8 @@ maturity this uses the logistic function:
   and the interquartile distance is 2.Ln(3)/b.
 }
 \examples{
-\dontrun{
 a <- -14.383
 b <- 0.146017
 lens <- seq(2,210,2)
 Maturity <- maturity(a,b,lens)
-}
 }

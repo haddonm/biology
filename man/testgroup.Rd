@@ -4,7 +4,7 @@
 \alias{testgroup}
 \title{testgroup literally compares sites using logistic regression}
 \usage{
-testgroup(grp, samdat, sitecol = "site", length = "length", mat10 = "mature")
+testgroup(grp, samdat, sitecol = "site", length = "length", mature = "mature")
 }
 \arguments{
 \item{grp}{a vector of at least two site numbers to be found in the 
@@ -17,7 +17,7 @@ column name = 'site'}
 
 \item{length}{column name in samdat for the length variable}
 
-\item{mat10}{column name for the maturity variable in samdat mature=1,
+\item{mature}{column name for the maturity variable in samdat mature=1,
 immature = 0}
 }
 \value{
@@ -29,6 +29,7 @@ testgroup using logistic regressions to compare whether
     or not.
 }
 \examples{
+args(testgroup)
 print("wait on internal data sets")
 # site1=grp;site2=grp2; sitecol="site";samdat=samb;length="length";mature="mature"
 }

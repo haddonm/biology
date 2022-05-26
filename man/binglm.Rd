@@ -23,7 +23,6 @@ binglm should really be an S3 method for binomial GLM
     outputs the summary (invisibly).
 }
 \examples{
-\dontrun{
+args(binglm)   #   ?binglm
  # wait on a data set being included into the package
-}
 }

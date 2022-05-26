@@ -5,36 +5,30 @@
 \title{plottwosites fits and plots two sites, including the combined by default}
 \usage{
 plottwogroups(
-  grp1,
-  grp2,
-  samdat,
+  sam1,
+  sam2,
   length = "length",
-  mat10 = "mature",
+  mature = "mature",
   sitecol = "site"
 )
 }
 \arguments{
-\item{grp1}{a vector of at least one site number to be found in the 
-data.frame samdat. The default column name = 'site'.}
+\item{sam1}{a data.frame containing the maturity data for group 1}
 
-\item{grp2}{a vector of at least one site number to be found in the 
-data.frame samdat. The default column name = 'site'.}
-
-\item{samdat}{a data.frame containing the maturity data that includes the two 
-sites}
+\item{sam2}{a data.frame containing the maturity data for group 2}
 
 \item{length}{column name of the length variable within the data.frame,
 default='length'}
 
-\item{mat10}{column name of the maturity variable containing mature=1, and
+\item{mature}{column name of the maturity variable containing mature=1, and
 immature = 0 for all length observations. default='mature'}
 
-\item{sitecol}{column name for the site number, default='combsite', ready for 
-when sites are combined}
+\item{sitecol}{column name of the variable for the site numbers. The default
+column name = 'site'}
 }
 \value{
-invisibly, a list containing the model fits for each site and the
-    combined sites if combine = TRUE
+invisibly, a list containing the model fits for each group of sites, 
+    and the model for all sites combined
 }
 \description{
 plottwosites fits a maturity curve for two sites and, by default, 
@@ -42,6 +36,7 @@ plottwosites fits a maturity curve for two sites and, by default,
     graph. The out is, invisibly, a list of all results.
 }
 \examples{
+args(plottwogroups)
 print("wait on internal data sets")
-# grp1=c(43,874,2);grp2=c(128); samdat=samW;length="length";mat10="mature";sitecol="site"
+# grp1=c(43,874,2);grp2=c(128); samdat=samW;length="length";mature="mature";sitecol="site"
 }

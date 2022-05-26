@@ -13,8 +13,8 @@ addpoints(
   jit = F,
   wobble = 1,
   refill = T,
-  Long = "Long",
-  Lat = "Lat",
+  Long = "long",
+  Lat = "lat",
   txtout = TRUE,
   namecatch = "catch_kg"
 )
@@ -61,8 +61,8 @@ addpoints given a matrix or data.frame, which must contain
 \examples{
 dev.new(height=6.0,width=7.5,noRStudioGD = TRUE)
 plotaus()
-Long <- c(140,141,142,143)
-Lat <- c(-41.1,-41.1,-41.1,-41.1)
-indata <- cbind(Long,Lat)
+long <- c(140,141,142,143)
+lat <- c(-41.1,-41.1,-41.1,-41.1)
+indata <- cbind(long,lat)
 addpoints(indata,incex=1.5)
 }

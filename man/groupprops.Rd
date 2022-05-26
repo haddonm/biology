@@ -26,6 +26,7 @@ groupprops extracts the main properties of two vectors of site
     subblock, date, and propM (proportion mature). It uses siteprops
 }
 \examples{
+args(groupprops)
 print("wait on internal data sets")
 # grp=c(780,783); samdat=samw; sitecol="site"; groupname="blk13"
 }

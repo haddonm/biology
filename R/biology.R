@@ -4,7 +4,8 @@
 #' @importFrom graphics abline grid hist lines mtext par plot points
 #' @importFrom graphics text title legend polygon
 #' @importFrom stats dnorm nlm optim quantile sd coef binomial glm anova
-#' @importFrom hutils getmax getmin makelabel
+#' @importFrom stats predict
+#' @importFrom hutils getmax getmin makelabel quants
 #' @importFrom hplot parset pickbound plotprep
 NULL
 

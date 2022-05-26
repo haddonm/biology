@@ -23,6 +23,7 @@ getloc isa utility function that extracts the lat longs, if
     present, for all the identified site numbers
 }
 \examples{
+args(getloc)
 print("wait on internal data sets")
 # sits=bsites; samdat=samb; orderby="none"
 }
