@@ -45,5 +45,4 @@ getsiteparams estimates the site parameters and all the model
 \examples{
 args(getsiteparams)
 print("wait on internal data sets")
-samdat=samnw; sitecol="site";length="length";mature="mature";sau="block";lower=20;upper=160
 }

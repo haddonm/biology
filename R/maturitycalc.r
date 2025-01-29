@@ -376,7 +376,7 @@ fitgroups <- function(groups,samdat,sitecol="site",length="length",
 #'
 #' @examples
 #' args(fitmaturity)
-#' print("wait on internal data sets")
+#' data(tasab)
 #' # sams=samdat;length="length";mature="mature";lower=50;upper=160
 fitmaturity <- function(sams,length="length",mature="mature",lower=50,upper=160) {
   model <- glm(mature ~ length, data=sams, family = binomial(link="logit"))
@@ -489,9 +489,10 @@ getloc <- function(sits,samdat,orderby="none") { #
 #' @examples
 #' args(getsiteparams)
 #' print("wait on internal data sets")
-#' samdat=samnw; sitecol="site";length="length";mature="mature";sau="block";lower=20;upper=160
 getsiteparams <- function(samdat,sitecol="site",length="length",mature="mature",
                           sau="block",lower=50,upper=160) {
+# samdat=samnw; sitecol="site";length="length";mature="mature";sau="block";
+# lower=20;upper=160  
   sits <- sort(unique(samdat[,sitecol]))
   nsits <- length(sits)
   allfit <- vector(mode="list",length=nsits)

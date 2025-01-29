@@ -39,6 +39,6 @@ fitmaturity uses data of the form maturity = 1 immaturity = 0,
 }
 \examples{
 args(fitmaturity)
-print("wait on internal data sets")
+data(tasab)
 # sams=samdat;length="length";mature="mature";lower=50;upper=160
 }
