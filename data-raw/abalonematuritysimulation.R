@@ -13,7 +13,7 @@
 # Winter_George  -20.37526 0.1909390 106.7108 11.507471 190
 
 suppressPackageStartupMessages({
-  library(hutils)
+  library(codeutils)
   library(hplot)
   library(makehtml)
   library(biology)

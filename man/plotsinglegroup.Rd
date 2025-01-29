@@ -9,10 +9,11 @@ plotsinglegroup(
   samdat,
   xmin = 0,
   xmax = 0,
-  margin = c(0.4, 0.4, 0.05, 0.05),
   sitecol = "site",
   length = "length",
-  mature = "mature"
+  mature = "mature",
+  lwd = 2,
+  makeplot = TRUE
 )
 }
 \arguments{
@@ -24,9 +25,6 @@ plotsinglegroup(
 
 \item{xmax}{a generic x-axis maximum?, if 0 use local, default=0}
 
-\item{margin}{what margin should be used in the plot? 
-default=c(0.4,0.4,0.05,0.05)}
-
 \item{sitecol}{column name of the variable for the site numbers. The default
 column name = 'site'}
 
@@ -34,6 +32,10 @@ column name = 'site'}
 
 \item{mature}{column name for the maturity variable in samdat mature=1,
 immature = 0}
+
+\item{lwd}{what line width to use for predicted maturity line, default=2}
+
+\item{makeplot}{should a plot be produced, default=TRUE}
 }
 \value{
 an invisible list containing the parameters and the fitmaturity 
@@ -47,5 +49,5 @@ plotsinglegroup after using findgroups one can use plotgroup to
 \examples{
 args(plotsinglegroup)
 print("wait on internal data sets")
-#  groups=group; samdat=samb;length="length";mature="mature";sitecol="site"
+#  groups=sits; samdat=sams;length="length";mature="mature";sitecol="site";xmin=0;xmax=0
 }

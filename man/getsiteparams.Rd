@@ -9,6 +9,7 @@ getsiteparams(
   sitecol = "site",
   length = "length",
   mature = "mature",
+  sau = "block",
   lower = 50,
   upper = 160
 )
@@ -23,6 +24,8 @@ column name = 'site'}
 
 \item{mature}{column name for the maturity variable in samdat mature=1,
 immature = 0}
+
+\item{sau}{column name for the sau or block in samdat, default='block'}
 
 \item{lower}{the smallest size class for inclusion in the predicted plot 
 data, the default = 50}
@@ -42,4 +45,5 @@ getsiteparams estimates the site parameters and all the model
 \examples{
 args(getsiteparams)
 print("wait on internal data sets")
+samdat=samnw; sitecol="site";length="length";mature="mature";sau="block";lower=20;upper=160
 }

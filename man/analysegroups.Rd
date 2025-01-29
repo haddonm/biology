@@ -31,5 +31,5 @@ analysegroups uses a block and a data.frame of maturity data to
 \examples{
 args(analysegroups)  #  ?analysegroups
 print("wait on internal datasets")
-# blk=13; samdat=samw; sitecol="site"
+# blk=5; samdat=samnw; sitecol="site"
 }

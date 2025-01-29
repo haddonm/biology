@@ -1,6 +1,38 @@
 
 
 
+
+library(biology)
+library(hplot)
+library(codeutils)
+
+
+x <- 25:175
+
+
+Wta <- 0.0000562 
+Wtb <- 3.161963
+	
+
+alta <- 0.00005531
+altb <- 3.219760
+
+y <- Wta * x ^ Wtb
+alty <- alta * x ^ altb
+
+plotprep(width=9, height=5,newdev=FALSE)
+plot1(x,y,lwd=2)
+lines(x,alty,lwd=3,col=2)
+
+
+
+
+
+
+
+
+
+
 # samb=sam; sitecol="siteseas"
 analyseall <- function(samb,sitecol="siteseas") {
   sites <- sort(unique(samb[,sitecol]))

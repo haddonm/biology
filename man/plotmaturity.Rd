@@ -11,7 +11,8 @@ plotmaturity(
   xmin = 0,
   xmax = 0,
   CI = FALSE,
-  setpar = FALSE
+  setpar = FALSE,
+  lwd = 2
 )
 }
 \arguments{
@@ -30,6 +31,8 @@ combination of site numbers making up a group}
 
 \item{setpar}{should parset be called, useful when only a single plot is
 being made. default=FALSE}
+
+\item{lwd}{what line width to use for predicted maturity line, default=2}
 }
 \value{
 nothing but it does generate a plot
@@ -44,6 +47,6 @@ print("wait on data sets")
 }
 \seealso{
 {
-  \link{fitmaturity} 
+  \link{fitmaturity}, \link{plotsinglegroup} 
 }
 }

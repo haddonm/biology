@@ -5,7 +5,7 @@
 #' @importFrom graphics text title legend polygon
 #' @importFrom stats dnorm nlm optim quantile sd coef binomial glm anova
 #' @importFrom stats predict
-#' @importFrom hutils getmax getmin makelabel quants
+#' @importFrom codeutils getmax getmin makelabel quants
 #' @importFrom hplot parset pickbound plotprep
 NULL
 
@@ -70,8 +70,9 @@ NULL
 #'   \item{tasab}{Abalone maturity data from two sites on the
 #'       south-west of Tasmania.}
 #' }
-#' @docType package
 #' @name biology
+#' @keywords internal
+"_PACKAGE"
 NULL
 
 

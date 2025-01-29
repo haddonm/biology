@@ -2,6 +2,7 @@
 % Please edit documentation in R/biology.R
 \docType{package}
 \name{biology}
+\alias{biology-package}
 \alias{biology}
 \title{biology functions for Invertebrate Maturity and Tagging Growth}
 \description{
@@ -70,3 +71,15 @@ Haddon, M., Mundy, C., and D. Tarbath (2008) Using an
     abalone (\emph{Haliotis rubra}) in Tasmania. \emph{Fishery Bulletin}
     \bold{106}: 58-71.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://www.github.com/haddonm/biology}
+}
+
+}
+\author{
+\strong{Maintainer}: Malcolm Haddon \email{malcolm.haddon@gmail.com}
+
+}
+\keyword{internal}

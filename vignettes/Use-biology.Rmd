@@ -22,7 +22,7 @@ options("show.signif.stars"=FALSE,
 ```
 
 ```{r setup}
-library(hutils)
+library(codeutils)
 library(hplot)
 library(biology)
 ```

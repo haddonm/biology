@@ -22,7 +22,7 @@
 #' @examples
 #' args(analysegroups)  #  ?analysegroups
 #' print("wait on internal datasets")
-#' # blk=13; samdat=samw; sitecol="site"
+#' # blk=5; samdat=samnw; sitecol="site"
 analysegroups <- function(blk,samdat,sitecol="site") {
   pickB <- which(samdat$block == blk)
   samb <- samdat[pickB,]
@@ -476,6 +476,7 @@ getloc <- function(sits,samdat,orderby="none") { #
 #' @param length column name in samdat for the length variable
 #' @param mature column name for the maturity variable in samdat mature=1,
 #'     immature = 0
+#' @param sau column name for the sau or block in samdat, default='block'
 #' @param lower the smallest size class for inclusion in the predicted plot 
 #'     data, the default = 50
 #' @param upper the largest size class for inclusion in the predicted plot 
@@ -488,20 +489,36 @@ getloc <- function(sits,samdat,orderby="none") { #
 #' @examples
 #' args(getsiteparams)
 #' print("wait on internal data sets")
+#' samdat=samnw; sitecol="site";length="length";mature="mature";sau="block";lower=20;upper=160
 getsiteparams <- function(samdat,sitecol="site",length="length",mature="mature",
-                          lower=50,upper=160) {
+                          sau="block",lower=50,upper=160) {
   sits <- sort(unique(samdat[,sitecol]))
   nsits <- length(sits)
   allfit <- vector(mode="list",length=nsits)
   names(allfit) <- sits
-  columns <- c("a","b","Lm50","IQm","n")
+  columns <- c("a","b","Lm50","IQm","n","site","sau")
   sitepar <- matrix(0,nrow=nsits,ncol=length(columns),dimnames=list(sits,columns))
   for (i in 1:nsits) { # i = 1
     picks <- which(samdat[,sitecol] == sits[i])
     model <- fitmaturity(sams=samdat[picks,],length=length,mature=mature,
                          lower=lower,upper=upper)
     allfit[[i]] <- model
-    sitepar[i,] <- c(model$param,length(model$out$out$deviance.resid))
+    sitepar[i,] <- c(model$param,length(model$out$out$deviance.resid),
+                                        sits[i],NA)
+  }
+  area <- sort(unique(samdat[,sau]))
+  narea <- length(area)  
+  if (narea > 0) {
+    if (narea == 1) {
+      sitepar[,"sau"] <- area
+    } else {
+     sitebysau <- table(samdat[,sitecol],samdat[,sau])
+     sits <- as.numeric(rownames(sitebysau))
+     for (i in 1:narea) { # i = 1
+       pick <- which(sitebysau[,as.character(area[i])] > 0)
+       sitepar[pick,"sau"] <- area[i]
+     }
+   }
   }
   return(invisible(list(sitepar=sitepar,allfit=allfit)))
 } # end of getsiteparams
@@ -708,9 +725,10 @@ plotgroups <- function(groups,samdat,xmin=0,xmax=0,sitecol="site",
 #' @param CI should the 95 perc CI be plotted? default=FALSE
 #' @param setpar should parset be called, useful when only a single plot is
 #'     being made. default=FALSE
+#' @param lwd what line width to use for predicted maturity line, default=2
 #' 
 #' @seealso {
-#'   \link{fitmaturity} 
+#'   \link{fitmaturity}, \link{plotsinglegroup} 
 #' }
 #'
 #' @return nothing but it does generate a plot
@@ -720,8 +738,9 @@ plotgroups <- function(groups,samdat,xmin=0,xmax=0,sitecol="site",
 #' args(plotmaturity)
 #' print("wait on data sets")
 plotmaturity <- function(model,label="",col=2,xmin=0,xmax=0,CI=FALSE,
-                         setpar=FALSE) {
+                         setpar=FALSE,lwd=2) {
   dat <- model$plotdat
+  nobs <- length(model$model$residuals)
   xlabel <- ""
   if (setpar) {
     parset()
@@ -733,7 +752,7 @@ plotmaturity <- function(model,label="",col=2,xmin=0,xmax=0,CI=FALSE,
   } 
   plot(dat[,"length"],dat[,"propm"],type="p",cex=1.0,pch=16,xlim=c(xmin,xmax),
        xlab=xlabel,ylab=label,yaxs="r",panel.first = grid())
-  lines(dat[,"length"],dat[,"predm"],lwd=2,col=col)
+  lines(dat[,"length"],dat[,"predm"],lwd=lwd,col=col)
   abline(h=c(0,0.5,1),lwd=1,col="grey")
   Lm50 <- model$param[1,"L50"]
   abline(v=Lm50,lwd=1,col=3)
@@ -742,6 +761,7 @@ plotmaturity <- function(model,label="",col=2,xmin=0,xmax=0,CI=FALSE,
     lines(dat[,"length"],dat[,"L95"],lwd=1,col=1,lty=2)
   }
   mtext(round(Lm50,3),side=3,line=-1.2,cex=1.0,adj=0)
+  mtext(nobs,side=3,line=-2.5,cex=1.0,adj=0)
 } # end of plotmaturity
 
 #' @title plotsinglegroup plots a maturity ~ length logistic regression to groups
@@ -754,13 +774,13 @@ plotmaturity <- function(model,label="",col=2,xmin=0,xmax=0,CI=FALSE,
 #' @param samdat a data.frame of maturity data containing the required site(s)
 #' @param xmin a generic x-axis minimum?, if 0 use local, default=0
 #' @param xmax a generic x-axis maximum?, if 0 use local, default=0
-#' @param margin what margin should be used in the plot? 
-#'     default=c(0.4,0.4,0.05,0.05)
 #' @param sitecol column name of the variable for the site numbers. The default
 #'     column name = 'site'
 #' @param length column name in samdat for the length variable
 #' @param mature column name for the maturity variable in samdat mature=1,
 #'     immature = 0
+#' @param lwd what line width to use for predicted maturity line, default=2   
+#' @param makeplot should a plot be produced, default=TRUE  
 #'
 #' @return an invisible list containing the parameters and the fitmaturity 
 #'     results. It also generates a plot.
@@ -769,27 +789,25 @@ plotmaturity <- function(model,label="",col=2,xmin=0,xmax=0,CI=FALSE,
 #' @examples
 #' args(plotsinglegroup)
 #' print("wait on internal data sets")
-#' #  groups=group; samdat=samb;length="length";mature="mature";sitecol="site"
-plotsinglegroup <- function(groups,samdat,xmin=0,xmax=0,margin=c(0.4,0.4,0.05,0.05),
-                            sitecol="site",length="length",mature="mature") { 
-  # outfit <- fitgroups(groups,samdat,sitecol=sitecol,length=length,mature=mature)
-  # fits <- outfit$fits
-  # nfits <- length(fits)
-  # for (i in 1:nfits) {
-  #   
-  # }
-  # combined <- fitmaturity(sites=groups,samdat=samdat,sitecol=sitecol,
-  #                         length=length,mature=mature)
-  # label <- makelabel("",groups)
-  # parset(margin=margin)
-  # plotmaturity(combined,label=label,xmin=xmin,xmax=xmax)
-  # colour <- 3:(nfits+2)
-  # for (i in 1:nfits) { #  i = 1
-  #   plotdat <- fits[[i]]$plotdat
-  #   lines(plotdat[,"lens"],plotdat[,"predm"],lwd=2,col=colour[i])
-  # }
-  # legend("bottomright",c(groups,label),col=c(colour,2),lwd=3,bty="n",cex=1.25)
-  # return(invisible(list(outfit=outfit,combined=combined)))
+#' #  groups=sits; samdat=sams;length="length";mature="mature";sitecol="site";xmin=0;xmax=0
+plotsinglegroup <- function(groups,samdat,xmin=0,xmax=0,sitecol="site",
+                            length="length",mature="mature",lwd=2,makeplot=TRUE) { 
+  outfit <- fitgroups(groups,samdat,sitecol=sitecol,length=length,mature=mature)
+  fits <- outfit$fits
+  nfits <- length(fits)
+  combined <- fitmaturity(sams=samdat,length=length,mature=mature)
+  if (makeplot) {
+    label <- paste0("sau",samdat$block[1])
+    plotmaturity(combined,label=label,xmin=xmin,xmax=xmax,lwd=lwd)
+    colour <- 3:(nfits+2)
+    for (i in 1:nfits) { #  i = 1
+      plotdat <- fits[[i]]$plotdat
+      lines(plotdat[,"length"],plotdat[,"predm"],lwd=1,col=colour[i])
+    }
+    legend("bottomright",legend=c(groups,nfits),col=c(colour,2),lwd=3,
+           bty="n",cex=1.25)
+  }
+  return(invisible(list(outfit=outfit,combined=combined)))
 } # end of plotsinglegroup
 
 #' @title plottwosites fits and plots two sites, including the combined by default

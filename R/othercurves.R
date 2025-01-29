@@ -55,6 +55,41 @@ doseR <- function(p,lens) {#
   return(ans)
 } # end of doseR
 
+#' @title fitexp fits an exponential model
+#' 
+#' @description fitexp fits an exponential model, such as a weight-at-length
+#'     model. Anything that uses a ydat = a.xdat^b form can be fitted by this 
+#'     function.
+#'
+#' @param xdat the values for the independent variable, eg length
+#' @param ydat the dependent variable, eg weight
+#'
+#' @return a list of the model, x and y, being the fitted curve, a and b 
+#'     the fitted coefficients, and n the number of observations, and the raw 
+#'     data
+#' @export
+#'
+#' @examples
+#' x <- seq(50,200,25)
+#' y <- c(15,55,130,275,490,790,1220)
+#' ans <- fitexp(x,y)
+#' cat("a = ", ans$a, " and b = ",ans$b,"\n")
+fitexp <- function(xdat,ydat) { # xdat=wasw[,"length"]; ydat=wasw[,"wholewt"]
+  n <- length(xdat)
+  if (length(ydat) != n)
+    stop("Length and Weight data of different lengths \n")
+  model <- lm(log(ydat) ~ log(xdat))
+  minx <- round(min(xdat))
+  maxx <- round(max(xdat))
+  coeff <- coef(model)
+  x <- minx:maxx  # note x and y has now changed
+  a <- exp(coeff[1])
+  b <- coeff[2]
+  y <- a * x ^ b
+  return(invisible(list(model=model,x=x,y=y,a=a,b=b,n=n,xdat=xdat,ydat=ydat)))
+} # end fitWtL
+
+
 #' @title fitgrow fits a tagging growth model to tagging data
 #' 
 #' @description fitgrow fits a selected tagging growth model to a set of 
@@ -84,6 +119,47 @@ fitgrow <- function(p,grow,sdfunc,dat,hessian=FALSE) { # p=c(1.46,12.0,6.5,0.5);
              gradtol = 1e-7)
   return(mod)
 } # end of fitgrow
+
+
+#' @title fitsiteweights fits each site's weight-at-length curve from an SAU 
+#' 
+#' @description fitsiteweights fits an exponential curve to the data from each 
+#'     site within an sau, along with an analysis of the sau data combined. The
+#'     names of the variables used are defined below, they will be natural-log
+#'     transofmred within fitexp so the raw values are required here.
+#'
+#' @param blk the block or SAU containing at least one site
+#' @param dat the dataframe containing at least site, length, and wholewt 
+#'     columns
+#' @param sau name of the statistical blocks being used, default='block'
+#' @param site name of the site numbers used, default='site'
+#' @param len name of the length variable used, default='length'
+#' @param wt name of the weight variable used, default='wholewt'
+#'
+#' @return a list of the model and x and y the predicted exponential curve
+#' @export
+#'
+#' @examples
+#' print("wait for data sets")
+fitsiteweights <- function(blk,dat,sau="block",site="site",len="length",
+                           wt="wholewt") { 
+  # blk=10; dat=wasw;sau="block";site="site";len="length";wt="wholewt"
+  pickB <- which(dat[,sau] == blk)
+  datb <- dat[pickB,]
+  sites <- sort(unique(datb[,site]))
+  nsite <- length(sites) 
+  resblk <- vector(mode="list",length=(nsite+1)) 
+  names(resblk) <- c(paste0(blk,":",sites),paste0(blk,":combined"))
+  for (i in 1:nsite) { # i = 1
+    picks <- which(datb[,site] == sites[i])
+    nobs <- length(picks)
+    ans <- fitexp(datb[picks,len],datb[picks,wt])
+    resblk[[i]] <- ans 
+  } 
+  ans <- fitexp(datb[,len],datb[,wt])
+  resblk[[nsite+1]] <- ans 
+  return(invisible(resblk))
+} # end of fitsiteweights
 
 #' @title negLLG calculates the negative log-likelihood for growth models
 #' 
@@ -167,6 +243,55 @@ outIL <- function(object,console=TRUE) {
   return(txt)
 } # end of outIL
 
+#' @title plotsiteweights plots each sites weight-at-length curve from an SAU 
+#' 
+#' @description plotsiteweights fits an exponential curve to the data from each 
+#'     site within an sau and, optionally plots them, along with an analysis 
+#'     and plot of the sau data combined. 
+#'
+#' @param resblk the output from fitsiteweights containing a list of fitexp
+#'     results
+#' @param cex.lab The font size of the axis labels, default=0.75 = small
+#'
+#' @return Nothing but a plot is generated
+#' @export
+#'
+#' @examples
+#' print("wait for data sets")
+plotsiteweights <- function(resblk,cex.lab=0.75) { 
+  # resblk=resblk
+  nsite <- length(resblk)-1 
+  label <- names(resblk)
+  comb <- nsite+1
+  ans <- resblk[[comb]]
+  minx <- getmin(ans$x,mult=1)
+  maxx <- getmax(ans$x,mult=1)
+  maxy <- getmax(ans$y)
+  parset(plots=pickbound((nsite+2)),outmargin = c(1.0,0,0,0),
+         margin=c(0.3,0.45,0.05,0.05),byrow=FALSE,cex.lab=cex.lab)
+  for (i in 1:nsite) { # i = 1
+    ans <- resblk[[i]]
+    plot1(ans$xdat,ans$ydat,type="p",cex=1,pch=16,
+          maxy=maxy,defpar=FALSE,xlim=c(minx,maxx),ylab=label[i])
+    lines(ans$x,ans$y,lwd=2,col=2)
+    mtext(paste0("  a = ",round(ans$a,7)),side=3,line=-1.1,adj=0,cex=1.1)
+    mtext(paste0("  b = ",round(ans$b,5)),side=3,line=-2.5,adj=0,cex=1.1)
+    mtext(paste0("  nobs = ",ans$n),side=3,line=-3.75,adj=0,cex=1.1)
+  } 
+  ans <- resblk[[comb]]
+  plot1(ans$xdat,ans$ydat,type="p",cex=1,pch=16,
+        maxy=maxy,defpar=FALSE,xlim=c(minx,maxx),ylab=label[comb])
+  lines(ans$x,ans$y,lwd=2,col=2)
+  mtext(paste0("  a = ",round(ans$a,7)),side=3,line=-1.1,adj=0,cex=1.1)
+  mtext(paste0("  b = ",round(ans$b,5)),side=3,line=-2.5,adj=0,cex=1.1)
+  mtext(paste0("  nobs = ",ans$n),side=3,line=-3.75,adj=0,cex=1.1)
+  plot1(ans$x,ans$y,lwd=3,col=2,maxy=maxy,ylab="Compare Curves",defpar=FALSE)
+  for (i in 1:nsite) {
+    lines(resblk[[i]]$x,resblk[[i]]$y,lwd=1,col=1)
+  }
+  lines(ans$x,ans$y,lwd=3,col=2)
+  mtext("Length mm",side=1,line=-0.1,outer=TRUE,cex=1.1)
+} # end of fitsiteweights
 
 
 #' @title projtozero extends the predicted inverse logistic to zero
@@ -183,6 +308,8 @@ projtozero <- function(ans) {
   y <- invlog(ans$model$estimate,x)
   lines(x,y,lwd=2,col=3)
 } #end of projtozero
+
+
 
 #' @title sdpow a power relationship used to describe the changing variance
 #' 
